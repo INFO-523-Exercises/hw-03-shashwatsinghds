@@ -1,0 +1,574 @@
+---
+title: "hw03-01"
+author: "Shashwat Singh"
+format: html
+editor: visual
+description: "Classification: Basic Concepts and Techniques"
+---
+
+# Install Required Packages
+
+```{r}
+# Sets the number of significant figures to two
+options(digits = 3)
+
+# Checking and installing pacman 
+if (!require(pacman))
+  install.packages("pacman")
+
+# Downloads and load required packages
+pacman::p_load(tidyverse, rpart, rpart.plot, caret, 
+  lattice, FSelector, sampling, pROC, mlbench)
+
+# Installed FSelector using the link provided in slack
+
+```
+
+# Introduction
+
+Classification is a machine learning task with the goal to learn a predictive function of the form
+
+**y=f(x)**
+
+where is **x** called the attribute set and **y**, the class label. The attribute set consists of feature which describe an object. These features can be measured using any scale (i.e., nominal, interval, ...). The class label is a nominal attribute. It it is a binary attribute, then the problem is called a binary classification problem.
+
+Classification learns the classification model from training data where both the features and the correct class label are available. This is why it is called a supervised learning problem.
+
+A related supervised learning problem is regression, where is a number instead of a label.
+
+This chapter will introduce decision trees, model evaluation and comparison, feature selection, and then explore methods to handle the class imbalance problem.
+
+-   Load data and view
+-   Examine columns and data types
+-   Define box plots
+-   Describe meta data
+
+# The Dataset
+
+Using the spam email dataset from tidyurl- The dataset classifies 4601 e-mails as spam or non-spam, with additional variables indicating the frequency of certain words and characters in the e-mail.
+
+The features in the table are as
+
+-   **crl.tot -** Total length of uninterrupted sequences of capitals
+
+-   **dollar -** Occurrences of the dollar sign, as percent of total number of characters
+
+-   **bang -** Occurrences of '!', as percent of total number of characters
+
+-   **money -** Occurrences of 'money', as percent of total number of characters
+
+-   **n000 -** Occurrences of the string '000', as percent of total number of words
+
+-   **make -** Occurrences of 'make', as a percent of total number of words
+
+-   **yesno -** Outcome variable, a factor with levels 'n' not spam, 'y' spam
+
+```{r}
+# Loading the dataset
+spam <- read.csv("/Users/shashwatsingh/Documents/GitHub/hw-03-shashwatsinghds/data/spam.csv") 
+
+head(spam)
+```
+
+-   Most of the features range between 0-1(as most are a percentage of the total number of words in the emails)
+
+```{r}
+#Properties of the data
+
+as_tibble(spam, rownames = "yesno")
+```
+
+```{r}
+spam <- spam |>
+  mutate(across(where(is.logical), factor, levels = c(y, n))) |>
+  mutate(across(where(is.character), factor))
+```
+
+```{r}
+summary(spam)
+```
+
+# Decision Trees
+
+Recursive Partitioning (similar to CART) uses the Gini index to make splitting decisions and early stopping (pre-pruning).
+
+```{r}
+library(rpart)
+```
+
+### Create Tree With Default Settings (uses pre-pruning)
+
+```{r}
+tree_default <- spam |> 
+  rpart(yesno ~ ., data = _)
+tree_default
+```
+
+**Notes:**
+
+-   `|>` supplies the data for `rpart`. Since `data` is not the first argument of `rpart`, the syntax `data = _` is used to specify where the data in spam goes. The call is equivalent to `tree_default <- rpart(yesno ~ ., data = spam)`.
+
+-   The formula models the `yesno` variable by all other features is represented by `.`.
+
+-   the class variable needs a factor (nominal) or rpart will create a regression tree instead of a decision tree. Use `as.factor()` if necessary
+
+Plotting
+
+```{r}
+library(rpart.plot)
+rpart.plot(tree_default, extra = 2)
+```
+
+### **Create a Full Tree**
+
+To create a full tree, we set the complexity parameter cp to 0 (split even if it does not improve the tree) and we set the minimum number of observations in a node needed to split to the smallest value of 2 (see: `?rpart.control`). *Note:* full trees overfit the training data!
+
+```{r}
+tree_full <- spam |> 
+  rpart(yesno ~ . , data = _, 
+        control = rpart.control(minsplit = 2, cp = 0))
+rpart.plot(tree_full, extra = 2, 
+           roundint=FALSE,
+           box.palette = list( "Bu","Or")
+           )
+```
+
+Due to numbers(continuous variables) being involved in decision making, the tree_full has too much partitioning for practical purposes.
+
+```{r}
+tree_full
+```
+
+Training error on tree with pre-pruning
+
+```{r}
+predict(tree_default, spam) |> head ()
+```
+
+```{r}
+pred <- predict(tree_default, spam, type="class")
+head(pred)
+```
+
+Here, the model is able to predict the classes for the entries with 100% accuracy.
+
+```{r}
+confusion_table <- with(spam, table(yesno, pred))
+confusion_table
+```
+
+Get correct prediction values
+
+```{r}
+correct <- confusion_table |> diag() |> sum()
+correct
+```
+
+Get error in predictions
+
+```{r}
+error <- confusion_table |> sum() - correct
+error
+```
+
+Accuracy
+
+```{r}
+accuracy <- correct / (correct + error)
+accuracy
+```
+
+The model is able to predict the class with decently high accuracy.
+
+Use a function for accuracy
+
+```{r}
+accuracy <- function(truth, prediction) {
+    tbl <- table(truth, prediction)
+    sum(diag(tbl))/sum(tbl)
+}
+
+accuracy(spam |> pull(yesno), pred)
+```
+
+Training error of the full tree
+
+```{r}
+accuracy(spam |> pull(yesno), 
+         predict(tree_full, spam, type = "class"))
+```
+
+Get a confusion table with more statistics (using caret)
+
+```{r}
+library(caret)
+confusionMatrix(data = pred, 
+                reference = spam |> pull(yesno))
+```
+
+### **Make Predictions for New Data**
+
+Make up my own emails: 2 Emails with characteristics, 1st one is close to how a regular email should be. 2nd one, I have purposely increase the value of spam characteristics.
+
+```{r}
+my_email <- tibble(crl.tot = 300, dollar = 0.010, bang = 0.020,
+  money = 0.43, n000 = 0.000, make = 0.34,yesno = NA)
+
+# Adding high obvious spam email characters to the vector
+my_email2<-tibble(crl.tot = 1000, dollar = 0.090, bang = 0.20,
+  money = 0.55, n000 = 0.002, make = 0.45,yesno = NA)
+```
+
+Make a prediction using the default tree
+
+```{r}
+predict(tree_default , my_email, type = "class")
+predict(tree_default , my_email2, type = "class")
+
+```
+
+# **Model Evaluation with Caret**
+
+The package [`caret`](https://topepo.github.io/caret/) makes preparing training sets, building classification (and regression) models and evaluation easier.
+
+```{r}
+library(caret)
+```
+
+Cross-validation runs are independent and can be done faster in parallel. To enable multi-core support, `caret` uses the package `foreach` and you need to load a `do` backend.
+
+```{r}
+## Linux backend
+if (!require(doMC))
+  install.packages("doMC") 
+library(doMC)
+registerDoMC(cores = 4)
+getDoParWorkers()
+```
+
+Set random number generator seed to make results reproducible
+
+```{r}
+set.seed(2000)
+```
+
+### **Hold out Test Data**
+
+Test data is not used in the model building process and set aside purely for testing the model. Here, we partition data the 80% training and 20% testing.
+
+```{r}
+inTrain <- createDataPartition(y = spam$yesno, p = .8, list = FALSE)
+spam_train <- spam |> slice(inTrain)
+```
+
+```{r}
+spam_test <- spam |> slice(-inTrain)
+```
+
+### **Learn a Model and Tune Hyperparameters on the Training Data**
+
+The package `caret` combines training and validation for hyperparameter tuning into a single function called `train()`. It internally splits the data into training and validation sets and thus will provide you with error estimates for different hyperparameter settings. `trainControl` is used to choose how testing is performed.
+
+For rpart, train tries to tune the `cp` parameter (tree complexity) using accuracy to chose the best model. I set `minsplit` to 2 since we have not much data. **Note:** Parameters used for tuning (in this case `cp`) need to be set using a data.frame in the argument `tuneGrid`! Setting it in control will be ignored.
+
+```{r}
+fit <- spam_train |>
+  train(yesno ~ .,
+    data = _ ,
+    method = "rpart",
+    control = rpart.control(minsplit = 2),
+    trControl = trainControl(method = "cv", number = 10),
+    tuneLength = 5)
+
+fit
+```
+
+**Note:** Train has built 10 trees using the training folds for each value of `cp` and the reported values for accuracy and Kappa are the averages on the validation folds.
+
+A model using the best tuning parameters and using all the data supplied to `train()` is available as `fit$finalModel`.
+
+```{r}
+rpart.plot(fit$finalModel, extra = 2,
+  box.palette = list("Bu", "Or"))
+```
+
+caret also computes variable importance. By default it uses competing splits (splits which would be runners up, but do not get chosen by the tree) for rpart models (see `? varImp`).
+
+```{r}
+varImp(fit)
+```
+
+Clearly, "bang" seems to be an important feature for classifying.
+
+Here is the variable importance without competing splits.
+
+```{r}
+imp <- varImp(fit, compete = FALSE)
+imp
+```
+
+Clearly, "dollar" seems to be an important feature for classifying here.
+
+```{r}
+ggplot(imp)
+```
+
+**Note:** Not all models provide a variable importance function. In this case caret might calculate the variable importance by itself and ignore the model (see `? varImp`)!
+
+# **Testing: Confusion Matrix and Confidence Interval for Accuracy**
+
+Use the best model on the test data
+
+```{r}
+pred <- predict(fit, newdata = spam_test)
+pred
+```
+
+Caret's `confusionMatrix()` function calculates accuracy, confidence intervals, kappa and many more evaluation metrics. You need to use separate test data to create a confusion matrix based on the generalization error.
+
+```{r}
+confusionMatrix(data = pred, 
+                ref = spam_test |> pull(yesno))
+```
+
+**Some notes**
+
+-   Many classification algorithms and `train` in caret do not deal well with missing values. If your classification model can deal with missing values (e.g., `rpart`) then use `na.action = na.pass` when you call `train` and `predict`. Otherwise, you need to remove observations with missing values with `na.omit` or use imputation to replace the missing values before you train the model. Make sure that you still have enough observations left.
+
+-   Make sure that nominal variables are coded as factors.
+
+-   The class variable for train in caret cannot have level names that are keywords in R (e.g., `TRUE` and `FALSE`). Rename them to, for example, "yes" and "no."
+
+-   Make sure that nominal variables (factors) have examples for all possible values. Some methods might have problems with variable values without examples. You can drop empty levels using `droplevels` or `factor`.
+
+-   Sampling in train might create a sample that does not contain examples for all values in a nominal (factor) variable. You will get an error message. This most likely happens for variables which have one very rare value. You may have to remove the variable.
+
+# **Model Comparison**
+
+We will compare decision trees with a k-nearest neighbors (kNN) classifier. We will create fixed sampling scheme (10-folds) so we compare the different models using exactly the same folds. It is specified as `trControl` during training.
+
+```{r}
+train_index <- createFolds(spam_train$yesno, k = 10)
+```
+
+Build models
+
+```{r}
+rpartFit <- spam_train |> 
+  train(yesno ~ .,
+        data = _,
+        method = "rpart",
+        tuneLength = 10,
+        trControl = trainControl(method = "cv", indexOut = train_index)
+  )
+```
+
+**Note:** for kNN we ask `train` to scale the data using `preProcess = "scale"`. Logicals will be used as 0-1 variables in Euclidean distance calculation.
+
+```{r}
+knnFit <- spam_train |> 
+  train(yesno ~ .,
+        data = _,
+        method = "knn",
+        preProcess = "scale",
+          tuneLength = 10,
+          trControl = trainControl(method = "cv", indexOut = train_index)
+  )
+```
+
+Compare accuracy over all folds.
+
+```{r}
+resamps <- resamples(list(
+        CART = rpartFit,
+        kNearestNeighbors = knnFit
+        ))
+
+summary(resamps)
+```
+
+`caret` provides some visualizations using the package `lattice`. For example, a boxplot to compare the accuracy and kappa distribution (over the 10 folds).
+
+```{r}
+library(lattice)
+bwplot(resamps, layout = c(3, 1))
+```
+
+\########
+
+We see that kNN is performing consistently better on the folds than CART (except for some outlier folds).
+
+Find out if one models is statistically better than the other (is the difference in accuracy is not zero).
+
+```{r}
+difs <- diff(resamps)
+difs
+```
+
+```{r}
+summary(difs)
+```
+
+p-values tells you the probability of seeing an even more extreme value (difference between accuracy) given that the null hypothesis (difference = 0) is true. For a better classifier, the p-value should be less than .05 or 0.01. `diff` automatically applies Bonferroni correction for multiple comparisons. In this case, kNN seems better but the classifiers do not perform statistically differently.
+
+# **Feature Selection and Feature Preparation**
+
+Decision trees implicitly select features for splitting, but we can also select features manually.
+
+```{r}
+if(!require(FSelector))
+  install.packages("FSelector")
+library(FSelector)
+```
+
+### **Univariate Feature Importance Score**
+
+These scores measure how related each feature is to the class variable. For discrete features (as in our case), the chi-square statistic can be used to derive a score.
+
+```{r}
+weights <- spam_train |> 
+  chi.squared(yesno ~ ., data = _) |>
+  as_tibble(rownames = "feature") |>
+  arrange(desc(attr_importance))
+
+weights
+```
+
+plot importance in descending order (using `reorder` to order factor levels used by `ggplot`).
+
+```{r}
+ggplot(weights,
+  aes(x = attr_importance, y = reorder(feature, attr_importance))) +
+  geom_bar(stat = "identity") +
+  xlab("Importance score") + 
+  ylab("Feature")
+```
+
+Get the 3 best features
+
+```{r}
+subset <- cutoff.k(weights |> 
+                   column_to_rownames("feature"), 3)
+subset
+```
+
+Use only the best 3 features to build a model (`Fselector` provides `as.simple.formula`)
+
+```{r}
+f <- as.simple.formula(subset, "yesno")
+f
+```
+
+```{r}
+m <- spam_train |> rpart(f, data = _)
+rpart.plot(m, extra = 2, roundint = FALSE)
+```
+
+There are many alternative ways to calculate univariate importance scores (see package FSelector). Some of them (also) work for continuous features. One example is the information gain ratio based on entropy as used in decision tree induction.
+
+```{r}
+spam_train |> 
+  gain.ratio(yesno ~ ., data = _) |>
+  as_tibble(rownames = "feature") |>
+  arrange(desc(attr_importance))
+```
+
+### **Feature Subset Selection**
+
+Often features are related and calculating importance for each feature independently is not optimal. We can use greedy search heuristics. For example `cfs` uses correlation/entropy with best first search.
+
+```{r}
+spam_train |> 
+  cfs(yesno ~ ., data = _)
+```
+
+Black-box feature selection uses an evaluator function (the black box) to calculate a score to be maximized. First, we define an evaluation function that builds a model given a subset of features and calculates a quality score. We use here the average for 5 bootstrap samples (`method = "cv"` can also be used instead), no tuning (to be faster), and the average accuracy as the score.
+
+```{r}
+evaluator <- function(subset) {
+  model <- spam_train |> 
+    train(as.simple.formula(subset, "yesno"),
+          data = _,
+          method = "rpart",
+          trControl = trainControl(method = "boot", number = 5),
+          tuneLength = 0)
+  results <- model$resample$Accuracy
+  cat("Trying features:", paste(subset, collapse = " + "), "\n")
+  m <- mean(results)
+  cat("Accuracy:", round(m, 2), "\n\n")
+  m
+}
+```
+
+Start with all features (but not the class variable `type`)
+
+```{r}
+features <- spam_train |> colnames() |> setdiff("yesno")
+```
+
+There are several (greedy) search strategies available. These run for a while!
+
+```{r}
+##subset <- backward.search(features, evaluator)
+##subset <- forward.search(features, evaluator)
+##subset <- best.first.search(features, evaluator)
+##subset <- hill.climbing.search(features, evaluator)
+
+# Commenting these out for faster render time.
+```
+
+### **Using Dummy Variables for Factors**
+
+-   Typically, a set of 0--1 dummy variables is used to encode nominal properties, also known as factors. For illustration, let's attempt to determine whether an email has dollar(\$) sign based on whether it's spam or not. First we use the original encoding of type as a factor with several values.
+
+    ```{r}
+    tree_dollar <- spam_train |> 
+      rpart(dollar ~ yesno, data = _)
+    rpart.plot(tree_dollar, extra = 1, roundint = FALSE)
+    ```
+
+    ```{r}
+    spam_train_dummy <- as_tibble(class2ind(spam_train$yesno)) |> 
+      mutate(across(everything(), as.factor)) |>
+      add_column(dollar = spam_train$dollar)
+    spam_train_dummy
+    ```
+
+    ```{r}
+    spam_dollar <- spam_train_dummy |> 
+      rpart(dollar ~ ., 
+            data = _,
+            control = rpart.control(minsplit = 2, cp = 0.01))
+    rpart.plot(spam_dollar, roundint = FALSE, box.palette = "Blues")
+    ```
+
+    ```{r}
+    fit <- spam_train |> 
+      train(dollar ~ yesno, 
+            data = _, 
+            method = "rpart",
+            control = rpart.control(minsplit = 2),
+            tuneGrid = data.frame(cp = 0.01))
+    fit
+    ```
+
+    ```{r}
+    rpart.plot(fit$finalModel, extra = 1)
+    ```
+
+# **Class Imbalance**
+
+Classifiers have a hard time to learn from data where we have much more observations for one class (called the majority class). This is called the class imbalance problem.
+
+```{r}
+library(rpart)
+library(rpart.plot)
+```
+
+Class Distribution
+
+```{r}
+ggplot(spam, aes(y = yesno)) + geom_bar()
+```
+
+Since this is a binary classification problem, and the dataset clearly isn't massively imbalanced, it is impractical to apply class balancing techniques.

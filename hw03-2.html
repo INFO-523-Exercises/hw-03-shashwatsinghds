@@ -1,0 +1,1943 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.433">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Shashwat Singh">
+<meta name="description" content="Classification: Alternative Techniques">
+
+<title>hw03-02</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="hw03-2_files/libs/clipboard/clipboard.min.js"></script>
+<script src="hw03-2_files/libs/quarto-html/quarto.js"></script>
+<script src="hw03-2_files/libs/quarto-html/popper.min.js"></script>
+<script src="hw03-2_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="hw03-2_files/libs/quarto-html/anchor.min.js"></script>
+<link href="hw03-2_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="hw03-2_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="hw03-2_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="hw03-2_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="hw03-2_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">hw03-02</h1>
+</div>
+
+<div>
+  <div class="description">
+    Classification: Alternative Techniques
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Shashwat Singh </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="install-required-packages" class="level2">
+<h2 class="anchored" data-anchor-id="install-required-packages">Install Required Packages</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sets the number of significant figures to two</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">digits =</span> <span class="dv">3</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">require</span>(pacman))</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">install.packages</span>(<span class="st">"pacman"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: pacman</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  C50,                <span class="co"># C5.0 Decision Trees and Rule-Based Models</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  caret,              <span class="co"># Classification and Regression Training</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  e1071,              <span class="co"># Misc Functions of the Department of Statistics (e1071), TU Wien</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  keras,              <span class="co"># R Interface to 'Keras'</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  kernlab,            <span class="co"># Kernel-Based Machine Learning Lab</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  lattice,            <span class="co"># Trellis Graphics for R</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  MASS,               <span class="co"># Support Functions and Datasets for Venables and Ripley's MASS</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  mlbench,            <span class="co"># Machine Learning Benchmark Problems</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  nnet,               <span class="co"># Feedforward Neural Networks and Multinomial Log-Linear Models</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  palmerpenguins,     <span class="co"># Palmer Archipelago (Antarctica) Penguin Data</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  party,              <span class="co"># A Laboratory for Recursive Partytioning</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  partykit,           <span class="co"># A Toolkit for Recursive Partytioning</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  randomForest,       <span class="co"># Breiman and Cutler's Random Forests for Classification and Regression</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  rpart,              <span class="co"># Recursive partitioning models</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  RWeka,              <span class="co"># R/Weka Interface</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  scales,             <span class="co"># Scale Functions for Visualization</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  tidymodels,         <span class="co"># Tidy machine learning framework</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  tidyverse,          <span class="co"># Tidy data wrangling and visualization</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  xgboost             <span class="co"># Extreme Gradient Boosting</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="training-and-test-data" class="level2">
+<h2 class="anchored" data-anchor-id="training-and-test-data"><strong>Training and Test Data</strong></h2>
+<p>Using the spam email dataset from tidyurl- The dataset classifies 4601 e-mails as spam or non-spam, with additional variables indicating the frequency of certain words and characters in the e-mail.</p>
+<p>The features in the table are as</p>
+<ul>
+<li><p><strong>crl.tot -</strong> Total length of uninterrupted sequences of capitals</p></li>
+<li><p><strong>dollar -</strong> Occurrences of the dollar sign, as percent of total number of characters</p></li>
+<li><p><strong>bang -</strong> Occurrences of ‘!’, as percent of total number of characters</p></li>
+<li><p><strong>money -</strong> Occurrences of ‘money’, as percent of total number of characters</p></li>
+<li><p><strong>n000 -</strong> Occurrences of the string ‘000’, as percent of total number of words</p></li>
+<li><p><strong>make -</strong> Occurrences of ‘make’, as a percent of total number of words</p></li>
+<li><p><strong>yesno -</strong> Outcome variable, a factor with levels ‘n’ not spam, ‘y’ spam</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Loading the dataset</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>spam <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"/Users/shashwatsingh/Documents/GitHub/hw-03-shashwatsinghds/data/spam.csv"</span>) </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>spam<span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(spam)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>spam <span class="sc">|&gt;</span> <span class="fu">glimpse</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 4,601
+Columns: 7
+$ crl.tot &lt;int&gt; 278, 1028, 2259, 191, 191, 54, 112, 49, 1257, 749, 21, 184, 26…
+$ dollar  &lt;dbl&gt; 0.000, 0.180, 0.184, 0.000, 0.000, 0.000, 0.054, 0.000, 0.203,…
+$ bang    &lt;dbl&gt; 0.778, 0.372, 0.276, 0.137, 0.135, 0.000, 0.164, 0.000, 0.181,…
+$ money   &lt;dbl&gt; 0.00, 0.43, 0.06, 0.00, 0.00, 0.00, 0.00, 0.00, 0.15, 0.00, 0.…
+$ n000    &lt;dbl&gt; 0.00, 0.43, 1.16, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.19, 0.…
+$ make    &lt;dbl&gt; 0.00, 0.21, 0.06, 0.00, 0.00, 0.00, 0.00, 0.00, 0.15, 0.06, 0.…
+$ yesno   &lt;chr&gt; "y", "y", "y", "y", "y", "y", "y", "y", "y", "y", "y", "y", "y…</code></pre>
+</div>
+</div>
+<p>Using the package “<a href="https://topepo.github.io/caret/"><strong>caret</strong></a><strong>“</strong> to make preparing training sets and building classification (and regression) models easier.</p>
+<p>Multi-core support can be used for cross-validation. <strong>Note:</strong> It is commented out here because it does not work with rJava used in RWeka below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="do">##library(doMC, quietly = TRUE)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="do">##registerDoMC(cores = 4)</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="do">##getDoParWorkers()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Test data is not used in the model building process and needs to be set aside purely for testing the model after it is completely built. Using 80-20 method, i.e., 80 percent for training and 20 percent for testing.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)  <span class="co"># for reproducibility</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>inTrain <span class="ot">&lt;-</span> <span class="fu">createDataPartition</span>(<span class="at">y =</span> spam<span class="sc">$</span>yesno, <span class="at">p =</span> .<span class="dv">8</span>)[[<span class="dv">1</span>]]</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>spam_train <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">slice</span>(spam, inTrain)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>spam_test <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">slice</span>(spam, <span class="sc">-</span>inTrain)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="fitting-different-classification-models-to-the-training-data" class="level2">
+<h2 class="anchored" data-anchor-id="fitting-different-classification-models-to-the-training-data"><strong>Fitting Different Classification Models to the Training Data</strong></h2>
+<p>Create a fixed sampling scheme (10-folds) so we can compare the fitted models later.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>train_index <span class="ot">&lt;-</span> <span class="fu">createFolds</span>(spam_train<span class="sc">$</span>yesno, <span class="at">k =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The fixed folds are used in <code>train()</code> with the argument <code>trControl = trainControl(method = "cv", indexOut = train_index))</code>. If you don't need fixed folds, then remove <code>indexOut = train_index</code> in the code below.</p>
+<p>For help with building models in caret see: <code>? train</code></p>
+<p><strong>Note:</strong> Be careful if you have many <code>NA</code> values in your data. <code>train()</code> and cross-validation many fail in some cases. If that is the case then you can remove features (columns) which have many <code>NA</code>s, omit <code>NA</code>s using <code>na.omit()</code> or use imputation to replace them with reasonable values (e.g., by the feature mean or via kNN). Highly imbalanced datasets are also problematic since there is a chance that a fold does not contain examples of each class leading to a hard to understand error message.</p>
+<section id="conditional-inference-tree-decision-tree" class="level3">
+<h3 class="anchored" data-anchor-id="conditional-inference-tree-decision-tree"><strong>Conditional Inference Tree (Decision Tree)</strong></h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>ctreeFit <span class="ot">&lt;-</span> spam_train <span class="sc">|&gt;</span> <span class="fu">train</span>(yesno <span class="sc">~</span> .,</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"ctree"</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> _,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">tuneLength =</span> <span class="dv">5</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"cv"</span>, <span class="at">indexOut =</span> train_index))</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>ctreeFit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Conditional Inference Tree 
+
+3682 samples
+   6 predictor
+   2 classes: 'n', 'y' 
+
+No pre-processing
+Resampling: Cross-Validated (10 fold) 
+Summary of sample sizes: 3313, 3314, 3314, 3314, 3314, 3314, ... 
+Resampling results across tuning parameters:
+
+  mincriterion  Accuracy  Kappa
+  0.010         0.888     0.758
+  0.255         0.882     0.744
+  0.500         0.879     0.737
+  0.745         0.878     0.734
+  0.990         0.871     0.722
+
+Accuracy was used to select the optimal model using the largest value.
+The final value used for the model was mincriterion = 0.01.</code></pre>
+</div>
+</div>
+<ul>
+<li>Notice that the highest Accuracy has the lowest mincriterion(here).</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ctreeFit<span class="sc">$</span>finalModel)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="c-4.5-decision-tree" class="level3">
+<h3 class="anchored" data-anchor-id="c-4.5-decision-tree"><strong>C 4.5 Decision Tree</strong></h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>C45Fit <span class="ot">&lt;-</span> spam_train <span class="sc">|&gt;</span> <span class="fu">train</span>(yesno <span class="sc">~</span> .,</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"J48"</span>,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> _,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">tuneLength =</span> <span class="dv">5</span>,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"cv"</span>, <span class="at">indexOut =</span> train_index))</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>C45Fit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>C4.5-like Trees 
+
+3682 samples
+   6 predictor
+   2 classes: 'n', 'y' 
+
+No pre-processing
+Resampling: Cross-Validated (10 fold) 
+Summary of sample sizes: 3314, 3314, 3314, 3314, 3314, 3313, ... 
+Resampling results across tuning parameters:
+
+  C      M  Accuracy  Kappa
+  0.010  1  0.883     0.750
+  0.010  2  0.883     0.750
+  0.010  3  0.882     0.746
+  0.010  4  0.881     0.744
+  0.010  5  0.881     0.744
+  0.133  1  0.889     0.760
+  0.133  2  0.888     0.759
+  0.133  3  0.887     0.757
+  0.133  4  0.885     0.752
+  0.133  5  0.884     0.750
+  0.255  1  0.890     0.762
+  0.255  2  0.889     0.761
+  0.255  3  0.888     0.758
+  0.255  4  0.885     0.752
+  0.255  5  0.885     0.751
+  0.378  1  0.891     0.765
+  0.378  2  0.891     0.764
+  0.378  3  0.889     0.760
+  0.378  4  0.885     0.751
+  0.378  5  0.886     0.754
+  0.500  1  0.891     0.765
+  0.500  2  0.891     0.764
+  0.500  3  0.889     0.761
+  0.500  4  0.887     0.755
+  0.500  5  0.887     0.756
+
+Accuracy was used to select the optimal model using the largest value.
+The final values used for the model were C = 0.378 and M = 1.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This was failing to render due to the complexity of tree</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>C45Fit<span class="sc">$</span>finalModel</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>J48 pruned tree
+------------------
+
+dollar &lt;= 0.055
+|   money &lt;= 0
+|   |   bang &lt;= 0.169
+|   |   |   n000 &lt;= 0.11
+|   |   |   |   bang &lt;= 0.028: n (1725.0/137.0)
+|   |   |   |   bang &gt; 0.028
+|   |   |   |   |   dollar &lt;= 0.005: n (256.0/49.0)
+|   |   |   |   |   dollar &gt; 0.005
+|   |   |   |   |   |   n000 &lt;= 0.04
+|   |   |   |   |   |   |   crl.tot &lt;= 819
+|   |   |   |   |   |   |   |   dollar &lt;= 0.039: n (6.0)
+|   |   |   |   |   |   |   |   dollar &gt; 0.039
+|   |   |   |   |   |   |   |   |   make &lt;= 0.11: n (13.0/5.0)
+|   |   |   |   |   |   |   |   |   make &gt; 0.11: y (4.0)
+|   |   |   |   |   |   |   crl.tot &gt; 819: y (6.0/1.0)
+|   |   |   |   |   |   n000 &gt; 0.04: n (3.0)
+|   |   |   n000 &gt; 0.11
+|   |   |   |   crl.tot &lt;= 205
+|   |   |   |   |   make &lt;= 0.45: y (13.0/2.0)
+|   |   |   |   |   make &gt; 0.45: n (2.0)
+|   |   |   |   crl.tot &gt; 205
+|   |   |   |   |   crl.tot &lt;= 1738: n (12.0/1.0)
+|   |   |   |   |   crl.tot &gt; 1738: y (2.0)
+|   |   bang &gt; 0.169
+|   |   |   crl.tot &lt;= 68
+|   |   |   |   bang &lt;= 0.757: n (202.0/43.0)
+|   |   |   |   bang &gt; 0.757
+|   |   |   |   |   crl.tot &lt;= 22
+|   |   |   |   |   |   bang &lt;= 3.907: n (32.0/5.0)
+|   |   |   |   |   |   bang &gt; 3.907
+|   |   |   |   |   |   |   bang &lt;= 7.707: y (5.0)
+|   |   |   |   |   |   |   bang &gt; 7.707: n (2.0)
+|   |   |   |   |   crl.tot &gt; 22
+|   |   |   |   |   |   bang &lt;= 4.347: y (36.0/6.0)
+|   |   |   |   |   |   bang &gt; 4.347: n (4.0)
+|   |   |   crl.tot &gt; 68
+|   |   |   |   bang &lt;= 0.563
+|   |   |   |   |   crl.tot &lt;= 179
+|   |   |   |   |   |   n000 &lt;= 0.15: n (91.0/40.0)
+|   |   |   |   |   |   n000 &gt; 0.15: y (5.0/1.0)
+|   |   |   |   |   crl.tot &gt; 179: y (71.0/10.0)
+|   |   |   |   bang &gt; 0.563: y (124.0/3.0)
+|   money &gt; 0
+|   |   bang &lt;= 0.081
+|   |   |   n000 &lt;= 0.3
+|   |   |   |   dollar &lt;= 0.024
+|   |   |   |   |   dollar &lt;= 0.019
+|   |   |   |   |   |   money &lt;= 1.32
+|   |   |   |   |   |   |   crl.tot &lt;= 5902: n (17.0/1.0)
+|   |   |   |   |   |   |   crl.tot &gt; 5902: y (2.0)
+|   |   |   |   |   |   money &gt; 1.32
+|   |   |   |   |   |   |   crl.tot &lt;= 54: n (7.0/2.0)
+|   |   |   |   |   |   |   crl.tot &gt; 54: y (6.0)
+|   |   |   |   |   dollar &gt; 0.019: y (2.0)
+|   |   |   |   dollar &gt; 0.024: n (6.0)
+|   |   |   n000 &gt; 0.3: y (4.0)
+|   |   bang &gt; 0.081
+|   |   |   crl.tot &lt;= 87
+|   |   |   |   crl.tot &lt;= 74
+|   |   |   |   |   money &lt;= 0.63
+|   |   |   |   |   |   make &lt;= 0.11: n (2.0)
+|   |   |   |   |   |   make &gt; 0.11: y (1.0)
+|   |   |   |   |   money &gt; 0.63: y (10.0)
+|   |   |   |   crl.tot &gt; 74: n (4.0)
+|   |   |   crl.tot &gt; 87: y (95.0/1.0)
+dollar &gt; 0.055
+|   bang &lt;= 0.143
+|   |   money &lt;= 0.02
+|   |   |   n000 &lt;= 0.49
+|   |   |   |   dollar &lt;= 0.168
+|   |   |   |   |   bang &lt;= 0.049: n (53.0/8.0)
+|   |   |   |   |   bang &gt; 0.049
+|   |   |   |   |   |   bang &lt;= 0.07: y (10.0)
+|   |   |   |   |   |   bang &gt; 0.07
+|   |   |   |   |   |   |   crl.tot &lt;= 126: y (3.0)
+|   |   |   |   |   |   |   crl.tot &gt; 126: n (12.0/2.0)
+|   |   |   |   dollar &gt; 0.168
+|   |   |   |   |   dollar &lt;= 0.188: y (12.0)
+|   |   |   |   |   dollar &gt; 0.188
+|   |   |   |   |   |   n000 &lt;= 0.1: n (45.0/20.0)
+|   |   |   |   |   |   n000 &gt; 0.1
+|   |   |   |   |   |   |   dollar &lt;= 0.291: n (1.0)
+|   |   |   |   |   |   |   dollar &gt; 0.291: y (3.0)
+|   |   |   n000 &gt; 0.49: y (33.0)
+|   |   money &gt; 0.02
+|   |   |   crl.tot &lt;= 53
+|   |   |   |   crl.tot &lt;= 50: n (3.0)
+|   |   |   |   crl.tot &gt; 50: y (7.0)
+|   |   |   crl.tot &gt; 53: y (113.0/2.0)
+|   bang &gt; 0.143
+|   |   crl.tot &lt;= 418
+|   |   |   bang &lt;= 0.376
+|   |   |   |   bang &lt;= 0.26: y (75.0/3.0)
+|   |   |   |   bang &gt; 0.26
+|   |   |   |   |   make &lt;= 0.27
+|   |   |   |   |   |   make &lt;= 0.08
+|   |   |   |   |   |   |   dollar &lt;= 0.165
+|   |   |   |   |   |   |   |   dollar &lt;= 0.104
+|   |   |   |   |   |   |   |   |   money &lt;= 0.19
+|   |   |   |   |   |   |   |   |   |   crl.tot &lt;= 62: n (2.0)
+|   |   |   |   |   |   |   |   |   |   crl.tot &gt; 62: y (7.0)
+|   |   |   |   |   |   |   |   |   money &gt; 0.19: n (1.0)
+|   |   |   |   |   |   |   |   dollar &gt; 0.104: y (15.0)
+|   |   |   |   |   |   |   dollar &gt; 0.165
+|   |   |   |   |   |   |   |   dollar &lt;= 0.466
+|   |   |   |   |   |   |   |   |   crl.tot &lt;= 102: n (7.0)
+|   |   |   |   |   |   |   |   |   crl.tot &gt; 102
+|   |   |   |   |   |   |   |   |   |   crl.tot &lt;= 226: y (4.0)
+|   |   |   |   |   |   |   |   |   |   crl.tot &gt; 226: n (2.0)
+|   |   |   |   |   |   |   |   dollar &gt; 0.466: y (3.0)
+|   |   |   |   |   |   make &gt; 0.08
+|   |   |   |   |   |   |   dollar &lt;= 0.46: n (2.0)
+|   |   |   |   |   |   |   dollar &gt; 0.46: y (1.0)
+|   |   |   |   |   make &gt; 0.27: y (10.0)
+|   |   |   bang &gt; 0.376: y (206.0/3.0)
+|   |   crl.tot &gt; 418: y (282.0)
+
+Number of Leaves  :     59
+
+Size of the tree :  117</code></pre>
+</div>
+</div>
+</section>
+<section id="k-nearest-neighbors" class="level3">
+<h3 class="anchored" data-anchor-id="k-nearest-neighbors"><strong>K-Nearest Neighbors</strong></h3>
+<p><strong>Note:</strong> kNN uses Euclidean distance, so data should be standardized (scaled) first. Here legs are measured between 0 and 6 while all other variables are between 0 and 1. Scaling can be directly performed as preprocessing in <code>train</code> using the parameter <code>preProcess = "scale"</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>knnFit <span class="ot">&lt;-</span> spam_train <span class="sc">|&gt;</span> <span class="fu">train</span>(yesno <span class="sc">~</span> .,</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"knn"</span>,</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> _,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">preProcess =</span> <span class="st">"scale"</span>,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">tuneLength =</span> <span class="dv">5</span>,</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">tuneGrid=</span><span class="fu">data.frame</span>(<span class="at">k =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>),</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"cv"</span>, <span class="at">indexOut =</span> train_index))</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>knnFit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>k-Nearest Neighbors 
+
+3682 samples
+   6 predictor
+   2 classes: 'n', 'y' 
+
+Pre-processing: scaled (6) 
+Resampling: Cross-Validated (10 fold) 
+Summary of sample sizes: 3314, 3314, 3314, 3314, 3314, 3314, ... 
+Resampling results across tuning parameters:
+
+  k   Accuracy  Kappa
+   1  0.963     0.921
+   2  0.913     0.816
+   3  0.906     0.800
+   4  0.890     0.765
+   5  0.889     0.763
+   6  0.886     0.756
+   7  0.880     0.744
+   8  0.876     0.733
+   9  0.878     0.738
+  10  0.875     0.730
+
+Accuracy was used to select the optimal model using the largest value.
+The final value used for the model was k = 1.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>knnFit<span class="sc">$</span>finalModel</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>1-nearest neighbor model
+Training set outcome distribution:
+
+   n    y 
+2231 1451 </code></pre>
+</div>
+</div>
+</section>
+<section id="part-rule-based-classifier" class="level3">
+<h3 class="anchored" data-anchor-id="part-rule-based-classifier"><strong>PART (Rule-based classifier)</strong></h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(doParallel)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: foreach</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'foreach'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:purrr':
+
+    accumulate, when</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: iterators</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: parallel</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">registerDoSEQ</span>()  </span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>rulesFit <span class="ot">&lt;-</span> spam_train <span class="sc">|&gt;</span> <span class="fu">train</span>(yesno <span class="sc">~</span> .,</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"PART"</span>,</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> _,</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">tuneLength =</span> <span class="dv">5</span>,</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"cv"</span>, <span class="at">indexOut =</span> train_index))</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>rulesFit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rule-Based Classifier 
+
+3682 samples
+   6 predictor
+   2 classes: 'n', 'y' 
+
+No pre-processing
+Resampling: Cross-Validated (10 fold) 
+Summary of sample sizes: 3314, 3314, 3314, 3314, 3313, 3314, ... 
+Resampling results across tuning parameters:
+
+  threshold  pruned  Accuracy  Kappa
+  0.010      yes     0.883     0.748
+  0.010      no      0.877     0.734
+  0.133      yes     0.886     0.756
+  0.133      no      0.877     0.734
+  0.255      yes     0.884     0.750
+  0.255      no      0.877     0.734
+  0.378      yes     0.883     0.749
+  0.378      no      0.877     0.734
+  0.500      yes     0.883     0.749
+  0.500      no      0.877     0.734
+
+Accuracy was used to select the optimal model using the largest value.
+The final values used for the model were threshold = 0.133 and pruned = yes.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>rulesFit<span class="sc">$</span>finalModel</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>PART decision list
+------------------
+
+dollar &gt; 0.055 AND
+bang &gt; 0.143 AND
+crl.tot &gt; 418: y (282.0)
+
+dollar &gt; 0.055 AND
+bang &gt; 0.049: y (438.0/36.0)
+
+money &gt; 0 AND
+n000 &lt;= 0.25 AND
+money &gt; 0.16 AND
+crl.tot &gt; 93: y (111.0/7.0)
+
+n000 &gt; 0.25 AND
+bang &gt; 0.003: y (82.0/2.0)
+
+bang &lt;= 0.171 AND
+dollar &lt;= 0.168 AND
+crl.tot &gt; 15 AND
+n000 &lt;= 0.16 AND
+money &lt;= 0.03 AND
+bang &lt;= 0.027: n (1313.0/136.0)
+
+crl.tot &lt;= 15 AND
+bang &lt;= 0.613: n (476.0/11.0)
+
+bang &gt; 0.486 AND
+crl.tot &gt; 64 AND
+make &lt;= 0.11: y (136.0/8.0)
+
+money &gt; 0.87 AND
+money &lt;= 1.47: y (19.0)
+
+n000 &gt; 0.27 AND
+make &lt;= 0.18 AND
+n000 &gt; 0.42: y (17.0)
+
+bang &lt;= 0.188 AND
+dollar &lt;= 0.005: n (311.0/64.0)
+
+crl.tot &lt;= 51 AND
+bang &lt;= 0.53 AND
+dollar &lt;= 0.279: n (105.0/18.0)
+
+crl.tot &lt;= 22 AND
+bang &lt;= 3.907: n (57.0/10.0)
+
+n000 &gt; 0.06 AND
+crl.tot &gt; 246 AND
+dollar &gt; 0.036: n (11.0)
+
+money &gt; 0 AND
+n000 &lt;= 0.24 AND
+crl.tot &lt;= 368: y (10.0/2.0)
+
+: y (314.0/142.0)
+
+Number of Rules  :  15</code></pre>
+</div>
+</div>
+</section>
+<section id="linear-support-vector-machines" class="level3">
+<h3 class="anchored" data-anchor-id="linear-support-vector-machines"><strong>Linear Support Vector Machines</strong></h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>svmFit <span class="ot">&lt;-</span> spam_train <span class="sc">|&gt;</span> <span class="fu">train</span>(yesno <span class="sc">~</span>.,</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"svmLinear"</span>,</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> _,</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">tuneLength =</span> <span class="dv">5</span>,</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"cv"</span>, <span class="at">indexOut =</span> train_index))</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>svmFit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Support Vector Machines with Linear Kernel 
+
+3682 samples
+   6 predictor
+   2 classes: 'n', 'y' 
+
+No pre-processing
+Resampling: Cross-Validated (10 fold) 
+Summary of sample sizes: 3314, 3314, 3314, 3314, 3314, 3313, ... 
+Resampling results:
+
+  Accuracy  Kappa
+  0.845     0.663
+
+Tuning parameter 'C' was held constant at a value of 1</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>svmFit<span class="sc">$</span>finalModel</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Support Vector Machine object of class "ksvm" 
+
+SV type: C-svc  (classification) 
+ parameter : cost C = 1 
+
+Linear (vanilla) kernel function. 
+
+Number of Support Vectors : 1516 
+
+Objective Function Value : -1509 
+Training error : 0.156437 </code></pre>
+</div>
+</div>
+</section>
+<section id="random-forest" class="level3">
+<h3 class="anchored" data-anchor-id="random-forest"><strong>Random Forest</strong></h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>randomForestFit <span class="ot">&lt;-</span> spam_train <span class="sc">|&gt;</span> <span class="fu">train</span>(yesno <span class="sc">~</span> .,</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"rf"</span>,</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> _,</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">tuneLength =</span> <span class="dv">5</span>,</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"cv"</span>, <span class="at">indexOut =</span> train_index))</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>randomForestFit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Random Forest 
+
+3682 samples
+   6 predictor
+   2 classes: 'n', 'y' 
+
+No pre-processing
+Resampling: Cross-Validated (10 fold) 
+Summary of sample sizes: 3313, 3314, 3314, 3314, 3313, 3314, ... 
+Resampling results across tuning parameters:
+
+  mtry  Accuracy  Kappa
+  2     0.922     0.832
+  3     0.943     0.878
+  4     0.958     0.910
+  5     0.962     0.919
+  6     0.964     0.923
+
+Accuracy was used to select the optimal model using the largest value.
+The final value used for the model was mtry = 6.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>randomForestFit<span class="sc">$</span>finalModel</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+ randomForest(x = x, y = y, mtry = param$mtry) 
+               Type of random forest: classification
+                     Number of trees: 500
+No. of variables tried at each split: 6
+
+        OOB estimate of  error rate: 12.5%
+Confusion matrix:
+     n    y class.error
+n 2050  181      0.0811
+y  279 1172      0.1923</code></pre>
+</div>
+</div>
+</section>
+<section id="gradient-boosted-decision-trees-xgboost" class="level3">
+<h3 class="anchored" data-anchor-id="gradient-boosted-decision-trees-xgboost"><strong>Gradient Boosted Decision Trees (xgboost)</strong></h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>xgboostFit <span class="ot">&lt;-</span> spam_train <span class="sc">|&gt;</span> <span class="fu">train</span>(yesno <span class="sc">~</span> .,</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"xgbTree"</span>,</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> _,</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">tuneLength =</span> <span class="dv">5</span>,</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"cv"</span>, <span class="at">indexOut =</span> train_index),</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">tuneGrid =</span> <span class="fu">expand.grid</span>(</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">nrounds =</span> <span class="dv">20</span>,</span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_depth =</span> <span class="dv">3</span>,</span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">colsample_bytree =</span> .<span class="dv">6</span>,</span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">eta =</span> <span class="fl">0.1</span>,</span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">gamma=</span><span class="dv">0</span>,</span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_child_weight =</span> <span class="dv">1</span>,</span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">subsample =</span> .<span class="dv">5</span></span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a>xgboostFit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>eXtreme Gradient Boosting 
+
+3682 samples
+   6 predictor
+   2 classes: 'n', 'y' 
+
+No pre-processing
+Resampling: Cross-Validated (10 fold) 
+Summary of sample sizes: 3314, 3313, 3314, 3314, 3314, 3314, ... 
+Resampling results:
+
+  Accuracy  Kappa
+  0.869     0.716
+
+Tuning parameter 'nrounds' was held constant at a value of 20
+Tuning
+ held constant at a value of 1
+Tuning parameter 'subsample' was held
+ constant at a value of 0.5</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>xgboostFit<span class="sc">$</span>finalModel</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>##### xgb.Booster
+raw: 26.3 Kb 
+call:
+  xgboost::xgb.train(params = list(eta = param$eta, max_depth = param$max_depth, 
+    gamma = param$gamma, colsample_bytree = param$colsample_bytree, 
+    min_child_weight = param$min_child_weight, subsample = param$subsample), 
+    data = x, nrounds = param$nrounds, objective = "binary:logistic")
+params (as set within xgb.train):
+  eta = "0.1", max_depth = "3", gamma = "0", colsample_bytree = "0.6", min_child_weight = "1", subsample = "0.5", objective = "binary:logistic", validate_parameters = "TRUE"
+xgb.attributes:
+  niter
+callbacks:
+  cb.print.evaluation(period = print_every_n)
+# of features: 6 
+niter: 20
+nfeatures : 6 
+xNames : crl.tot dollar bang money n000 make 
+problemType : Classification 
+tuneValue :
+      nrounds max_depth eta gamma colsample_bytree min_child_weight subsample
+1      20         3 0.1     0              0.6                1       0.5
+obsLevels : n y 
+param :
+    list()</code></pre>
+</div>
+</div>
+</section>
+<section id="artificial-neural-network" class="level3">
+<h3 class="anchored" data-anchor-id="artificial-neural-network"><strong>Artificial Neural Network</strong></h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>nnetFit <span class="ot">&lt;-</span> spam_train <span class="sc">|&gt;</span> <span class="fu">train</span>(yesno <span class="sc">~</span> .,</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"nnet"</span>,</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> _,</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">tuneLength =</span> <span class="dv">5</span>,</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"cv"</span>, <span class="at">indexOut =</span> train_index),</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">trace =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>nnetFit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Neural Network 
+
+3682 samples
+   6 predictor
+   2 classes: 'n', 'y' 
+
+No pre-processing
+Resampling: Cross-Validated (10 fold) 
+Summary of sample sizes: 3314, 3314, 3314, 3314, 3314, 3313, ... 
+Resampling results across tuning parameters:
+
+  size  decay  Accuracy  Kappa
+  1     0e+00  0.810     0.564
+  1     1e-04  0.781     0.486
+  1     1e-03  0.857     0.697
+  1     1e-02  0.834     0.631
+  1     1e-01  0.833     0.628
+  3     0e+00  0.872     0.727
+  3     1e-04  0.869     0.720
+  3     1e-03  0.877     0.737
+  3     1e-02  0.875     0.732
+  3     1e-01  0.875     0.731
+  5     0e+00  0.878     0.738
+  5     1e-04  0.878     0.738
+  5     1e-03  0.851     0.666
+  5     1e-02  0.877     0.736
+  5     1e-01  0.878     0.739
+  7     0e+00  0.875     0.731
+  7     1e-04  0.875     0.733
+  7     1e-03  0.877     0.736
+  7     1e-02  0.877     0.736
+  7     1e-01  0.879     0.740
+  9     0e+00  0.876     0.735
+  9     1e-04  0.878     0.740
+  9     1e-03  0.879     0.740
+  9     1e-02  0.877     0.735
+  9     1e-01  0.878     0.737
+
+Accuracy was used to select the optimal model using the largest value.
+The final values used for the model were size = 7 and decay = 0.1.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>nnetFit<span class="sc">$</span>finalModel</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>a 6-7-1 network with 57 weights
+inputs: crl.tot dollar bang money n000 make 
+output(s): .outcome 
+options were - entropy fitting  decay=0.1</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="comparing-models" class="level2">
+<h2 class="anchored" data-anchor-id="comparing-models"><strong>Comparing Models</strong></h2>
+<p>Now, we will be comparing different models trained on the same data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>resamps <span class="ot">&lt;-</span> <span class="fu">resamples</span>(<span class="fu">list</span>(</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">ctree =</span> ctreeFit,</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">C45 =</span> C45Fit,</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">SVM =</span> svmFit,</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">KNN =</span> knnFit,</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">rules =</span> rulesFit,</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">randomForest =</span> randomForestFit,</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">xgboost =</span> xgboostFit,</span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">NeuralNet =</span> nnetFit</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>    ))</span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>resamps</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+resamples.default(x = list(ctree = ctreeFit, C45 = C45Fit, SVM = svmFit, KNN
+ = knnFit, rules = rulesFit, randomForest = randomForestFit, xgboost
+ = xgboostFit, NeuralNet = nnetFit))
+
+Models: ctree, C45, SVM, KNN, rules, randomForest, xgboost, NeuralNet 
+Number of resamples: 10 
+Performance metrics: Accuracy, Kappa 
+Time estimates for: everything, final model fit </code></pre>
+</div>
+</div>
+<p>Calculating summary stats</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(resamps)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+summary.resamples(object = resamps)
+
+Models: ctree, C45, SVM, KNN, rules, randomForest, xgboost, NeuralNet 
+Number of resamples: 10 
+
+Accuracy 
+              Min. 1st Qu. Median  Mean 3rd Qu.  Max. NA's
+ctree        0.867   0.878  0.887 0.888   0.897 0.910    0
+C45          0.875   0.876  0.893 0.891   0.900 0.918    0
+SVM          0.812   0.834  0.844 0.845   0.862 0.867    0
+KNN          0.948   0.954  0.963 0.963   0.969 0.978    0
+rules        0.867   0.876  0.883 0.886   0.891 0.924    0
+randomForest 0.954   0.959  0.959 0.964   0.967 0.976    0
+xgboost      0.821   0.861  0.871 0.869   0.882 0.902    0
+NeuralNet    0.856   0.868  0.881 0.879   0.885 0.905    0
+
+Kappa 
+              Min. 1st Qu. Median  Mean 3rd Qu.  Max. NA's
+ctree        0.710   0.734  0.757 0.758   0.780 0.806    0
+C45          0.726   0.732  0.767 0.765   0.783 0.825    0
+SVM          0.590   0.635  0.661 0.663   0.698 0.712    0
+KNN          0.890   0.902  0.922 0.921   0.936 0.954    0
+rules        0.718   0.734  0.747 0.756   0.762 0.838    0
+randomForest 0.902   0.914  0.914 0.923   0.931 0.949    0
+xgboost      0.605   0.702  0.719 0.716   0.747 0.791    0
+NeuralNet    0.688   0.715  0.745 0.740   0.752 0.798    0</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lattice)</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bwplot</span>(resamps, <span class="at">layout =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Perform inference about differences between models. For each metric, all pair-wise differences are computed and tested to assess if the difference is equal to zero. By default Bonferroni correction for multiple comparison is used. Differences are shown in the upper triangle and p-values are in the lower triangle.</p>
+<ul>
+<li>Random forest Fit is performing the best here.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>difs <span class="ot">&lt;-</span> <span class="fu">diff</span>(resamps)</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>difs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+diff.resamples(x = resamps)
+
+Models: ctree, C45, SVM, KNN, rules, randomForest, xgboost, NeuralNet 
+Metrics: Accuracy, Kappa 
+Number of differences: 28 
+p-value adjustment: bonferroni </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(difs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+summary.diff.resamples(object = difs)
+
+p-value adjustment: bonferroni 
+Upper diagonal: estimates of the difference
+Lower diagonal: p-value for H0: difference = 0
+
+Accuracy 
+             ctree    C45      SVM      KNN      rules    randomForest xgboost 
+ctree                 -0.00326  0.04264 -0.07470  0.00136 -0.07578      0.01901
+C45          1.000000           0.04590 -0.07143  0.00462 -0.07252      0.02227
+SVM          0.000207 1.33e-05          -0.11734 -0.04129 -0.11842     -0.02364
+KNN          1.93e-06 1.74e-06 5.95e-08           0.07605 -0.00108      0.09370
+rules        1.000000 1.000000 7.80e-05 1.33e-06          -0.07713      0.01765
+randomForest 3.31e-07 7.79e-07 1.14e-07 1.000000 1.48e-06               0.09478
+xgboost      0.157373 0.041002 0.205514 1.89e-05 0.766137 8.18e-06             
+NeuralNet    0.614197 0.059445 0.001782 8.27e-07 1.000000 1.96e-07     1.000000
+             NeuralNet
+ctree         0.00896 
+C45           0.01222 
+SVM          -0.03368 
+KNN           0.08366 
+rules         0.00761 
+randomForest  0.08474 
+xgboost      -0.01004 
+NeuralNet             
+
+Kappa 
+             ctree    C45      SVM      KNN      rules    randomForest xgboost 
+ctree                 -0.00649  0.09557 -0.16262  0.00200 -0.16496      0.04204
+C45          1.000000           0.10205 -0.15613  0.00848 -0.15847      0.04852
+SVM          0.000191 1.19e-05          -0.25819 -0.09357 -0.26053     -0.05353
+KNN          2.43e-06 1.71e-06 5.84e-08           0.16462 -0.00234      0.20466
+rules        1.000000 1.000000 7.61e-05 1.07e-06          -0.16696      0.04004
+randomForest 4.28e-07 7.99e-07 1.18e-07 1.000000 9.94e-07               0.20700
+xgboost      0.224991 0.080016 0.220869 2.73e-05 0.763800 1.20e-05             
+NeuralNet    1.000000 0.092422 0.001097 9.08e-07 1.000000 2.14e-07     1.000000
+             NeuralNet
+ctree         0.01792 
+C45           0.02440 
+SVM          -0.07765 
+KNN           0.18054 
+rules         0.01592 
+randomForest  0.18288 
+xgboost      -0.02412 
+NeuralNet             </code></pre>
+</div>
+</div>
+<p>All perform similarly well except ctree (differences in the first row are negative and the p-values in the first column are &lt;.05 indicating that the null-hypothesis of a difference of 0 can be rejected).</p>
+</section>
+<section id="applying-the-chosen-model-to-the-test-data" class="level2">
+<h2 class="anchored" data-anchor-id="applying-the-chosen-model-to-the-test-data"><strong>Applying the Chosen Model to the Test Data</strong></h2>
+<p>KNN and Random forest model do similarly well on the data. We choose here the random forest model.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>pr <span class="ot">&lt;-</span> <span class="fu">predict</span>(randomForestFit, spam_test)</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>pr</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  [1] n n y y y n y y y y y y y y y n y y y y n y y y y n y y y y n y y n y y n
+ [38] y y y n y y y y y n y y y y y y y n y y y y y y y n y y n y y y y y y y n
+ [75] y y y y y n y y y y y y y y y y n n y y y n n y y y y y y n n y y y y n y
+[112] y y n y n n y y y y n n y n n y y y y y y y y y y y n y y y y y y y y n y
+[149] y y y y y y n y y y y y y y y y y y n n y y y y y y y y n y y y y n y y y
+[186] y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y n y y n y y y
+[223] y y y y n y y y y y y y y n y n y n n y y y y y n y n y y y y y y y y y y
+[260] y y y y n y y n y y y y y y y y y y n n y y n y n n y y n y y y y y n y n
+[297] y y n y n y y n y y y n y n y y y y y n y n y n y y n y y y y n y y n y y
+[334] y n y y y n n y y y y y n y y y y y n y y y y y y n n y y n n n n n n n n
+[371] n n n n n n n n n n n n n n n n n n y n y y n n n n n n y y n n y n n n n
+[408] n n n n n n n y y n n n n n n n n n n n n n n n n n n n n n n n y n n n n
+[445] n n n n n n n n n n n n n y n n n n n n n n n n y n y n n n n y n n n y n
+[482] n n n n n n y n y n n n n n n n n n n n n n n y n n n n n n n n n n n y n
+[519] n n n n n n n n n n n n n n n n n n n n n n n n n n n n n n n n n n n n n
+[556] n n n n n n n n n n n n n n n n n n n n n y n n n n n n n n n n n n n n n
+[593] n n n n n n n y n n n n n n n n n n n n n n n n n n y n y n n n n n n n n
+[630] n n n n n n n n n n n n n n n n n n n n n n n n n n n n n y n n n n n n n
+[667] n n n n n n n n n n n n n y n n y n n n n n n n n n n n n n y n y n n n n
+[704] n n n n n n n n n n n n n n n n n n n n n n n n n n n n n n n n n n n n n
+[741] n n n n y n n n n n n n y n n n n n n n n n n n n n n n n n n n n n n n n
+[778] n n n n n n n n n n n n n n n n n n n n n y n n n n n n n n n n n n n n n
+[815] n n n n n n n y n n n n n n n y n n n n n n n n y n n n n n n n n n n n n
+[852] n n n n n y y n n n n n n n n n n y n n n n n n n n y n n y n n n n n n y
+[889] n n n n n n n n y y n n n n y n n n n n n n n n n n n n n n n
+Levels: n y</code></pre>
+</div>
+</div>
+<p>Calculate the confusion matrix for the held-out test data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co">#confusionMatrix(pr, reference = spam_test$yesno)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="comparing-decision-boundaries-of-popular-classification-techniques" class="level2">
+<h2 class="anchored" data-anchor-id="comparing-decision-boundaries-of-popular-classification-techniques"><strong>Comparing Decision Boundaries of Popular Classification Techniques</strong></h2>
+<p>Classifiers create decision boundaries to discriminate between classes. Different classifiers are able to create different shapes of decision boundaries (e.g., some are strictly linear) and thus some classifiers may perform better for certain datasets. This page visualizes the decision boundaries found by several popular classification methods.</p>
+<p>The following plot adds the decision boundary (black lines) and classification confidence (color intensity) by evaluating the classifier at evenly spaced grid points. Note that low resolution (to make evaluation faster) will make the decision boundary look like it has small steps even if it is a (straight) line.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a>decisionplot <span class="ot">&lt;-</span> <span class="cf">function</span>(model, data, class_var, </span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">predict_type =</span> <span class="fu">c</span>(<span class="st">"class"</span>, <span class="st">"prob"</span>), <span class="at">resolution =</span> <span class="dv">3</span> <span class="sc">*</span> <span class="dv">72</span>) {</span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># resolution is set to 72 dpi if the image is rendered  3 inches wide. </span></span>
+<span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb59-10"><a href="#cb59-10" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> data <span class="sc">|&gt;</span> <span class="fu">pull</span>(class_var)</span>
+<span id="cb59-11"><a href="#cb59-11" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;-</span> data <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span><span class="fu">all_of</span>(class_var))</span>
+<span id="cb59-12"><a href="#cb59-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb59-13"><a href="#cb59-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># resubstitution accuracy</span></span>
+<span id="cb59-14"><a href="#cb59-14" aria-hidden="true" tabindex="-1"></a>  prediction <span class="ot">&lt;-</span> <span class="fu">predict</span>(model, x, <span class="at">type =</span> predict_type[<span class="dv">1</span>])</span>
+<span id="cb59-15"><a href="#cb59-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># LDA returns a list</span></span>
+<span id="cb59-16"><a href="#cb59-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">is.list</span>(prediction)) prediction <span class="ot">&lt;-</span> prediction<span class="sc">$</span>class</span>
+<span id="cb59-17"><a href="#cb59-17" aria-hidden="true" tabindex="-1"></a>  prediction <span class="ot">&lt;-</span> <span class="fu">factor</span>(prediction, <span class="at">levels =</span> <span class="fu">levels</span>(y))</span>
+<span id="cb59-18"><a href="#cb59-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb59-19"><a href="#cb59-19" aria-hidden="true" tabindex="-1"></a>  cm <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(<span class="at">data =</span> prediction, </span>
+<span id="cb59-20"><a href="#cb59-20" aria-hidden="true" tabindex="-1"></a>                        <span class="at">reference =</span> y)</span>
+<span id="cb59-21"><a href="#cb59-21" aria-hidden="true" tabindex="-1"></a>  acc <span class="ot">&lt;-</span> cm<span class="sc">$</span>overall[<span class="st">"Accuracy"</span>]</span>
+<span id="cb59-22"><a href="#cb59-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb59-23"><a href="#cb59-23" aria-hidden="true" tabindex="-1"></a>  <span class="co"># evaluate model on a grid</span></span>
+<span id="cb59-24"><a href="#cb59-24" aria-hidden="true" tabindex="-1"></a>  r <span class="ot">&lt;-</span> <span class="fu">sapply</span>(x[, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>], range, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb59-25"><a href="#cb59-25" aria-hidden="true" tabindex="-1"></a>  xs <span class="ot">&lt;-</span> <span class="fu">seq</span>(r[<span class="dv">1</span>,<span class="dv">1</span>], r[<span class="dv">2</span>,<span class="dv">1</span>], <span class="at">length.out =</span> resolution)</span>
+<span id="cb59-26"><a href="#cb59-26" aria-hidden="true" tabindex="-1"></a>  ys <span class="ot">&lt;-</span> <span class="fu">seq</span>(r[<span class="dv">1</span>,<span class="dv">2</span>], r[<span class="dv">2</span>,<span class="dv">2</span>], <span class="at">length.out =</span> resolution)</span>
+<span id="cb59-27"><a href="#cb59-27" aria-hidden="true" tabindex="-1"></a>  g <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="fu">rep</span>(xs, <span class="at">each =</span> resolution), <span class="fu">rep</span>(ys, <span class="at">time =</span> resolution))</span>
+<span id="cb59-28"><a href="#cb59-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">colnames</span>(g) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(r)</span>
+<span id="cb59-29"><a href="#cb59-29" aria-hidden="true" tabindex="-1"></a>  g <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(g)</span>
+<span id="cb59-30"><a href="#cb59-30" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb59-31"><a href="#cb59-31" aria-hidden="true" tabindex="-1"></a>  <span class="do">### guess how to get class labels from predict</span></span>
+<span id="cb59-32"><a href="#cb59-32" aria-hidden="true" tabindex="-1"></a>  <span class="do">### (unfortunately not very consistent between models)</span></span>
+<span id="cb59-33"><a href="#cb59-33" aria-hidden="true" tabindex="-1"></a>  cl <span class="ot">&lt;-</span> <span class="fu">predict</span>(model, g, <span class="at">type =</span> predict_type[<span class="dv">1</span>])</span>
+<span id="cb59-34"><a href="#cb59-34" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb59-35"><a href="#cb59-35" aria-hidden="true" tabindex="-1"></a>  <span class="co"># LDA returns a list</span></span>
+<span id="cb59-36"><a href="#cb59-36" aria-hidden="true" tabindex="-1"></a>  prob <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb59-37"><a href="#cb59-37" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">is.list</span>(cl)) { </span>
+<span id="cb59-38"><a href="#cb59-38" aria-hidden="true" tabindex="-1"></a>    prob <span class="ot">&lt;-</span> cl<span class="sc">$</span>posterior</span>
+<span id="cb59-39"><a href="#cb59-39" aria-hidden="true" tabindex="-1"></a>    cl <span class="ot">&lt;-</span> cl<span class="sc">$</span>class</span>
+<span id="cb59-40"><a href="#cb59-40" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span></span>
+<span id="cb59-41"><a href="#cb59-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="sc">!</span><span class="fu">is.na</span>(predict_type[<span class="dv">2</span>]))</span>
+<span id="cb59-42"><a href="#cb59-42" aria-hidden="true" tabindex="-1"></a>      <span class="fu">try</span>(prob <span class="ot">&lt;-</span> <span class="fu">predict</span>(model, g, <span class="at">type =</span> predict_type[<span class="dv">2</span>]))</span>
+<span id="cb59-43"><a href="#cb59-43" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb59-44"><a href="#cb59-44" aria-hidden="true" tabindex="-1"></a>  <span class="co"># we visualize the difference in probability/score between the </span></span>
+<span id="cb59-45"><a href="#cb59-45" aria-hidden="true" tabindex="-1"></a>  <span class="co"># winning class and the second best class.</span></span>
+<span id="cb59-46"><a href="#cb59-46" aria-hidden="true" tabindex="-1"></a>  <span class="co"># don't use probability if predict for the classifier does not support it.</span></span>
+<span id="cb59-47"><a href="#cb59-47" aria-hidden="true" tabindex="-1"></a>  max_prob <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb59-48"><a href="#cb59-48" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span><span class="fu">is.null</span>(prob))</span>
+<span id="cb59-49"><a href="#cb59-49" aria-hidden="true" tabindex="-1"></a>    <span class="fu">try</span>({</span>
+<span id="cb59-50"><a href="#cb59-50" aria-hidden="true" tabindex="-1"></a>      max_prob <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">apply</span>(prob, <span class="at">MARGIN =</span> <span class="dv">1</span>, sort, <span class="at">decreasing =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb59-51"><a href="#cb59-51" aria-hidden="true" tabindex="-1"></a>      max_prob <span class="ot">&lt;-</span> max_prob[,<span class="dv">1</span>] <span class="sc">-</span> max_prob[,<span class="dv">2</span>]</span>
+<span id="cb59-52"><a href="#cb59-52" aria-hidden="true" tabindex="-1"></a>    }, <span class="at">silent =</span> <span class="cn">TRUE</span>) </span>
+<span id="cb59-53"><a href="#cb59-53" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb59-54"><a href="#cb59-54" aria-hidden="true" tabindex="-1"></a>  cl <span class="ot">&lt;-</span> <span class="fu">factor</span>(cl, <span class="at">levels =</span> <span class="fu">levels</span>(y))</span>
+<span id="cb59-55"><a href="#cb59-55" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb59-56"><a href="#cb59-56" aria-hidden="true" tabindex="-1"></a>  g <span class="ot">&lt;-</span> g <span class="sc">|&gt;</span> <span class="fu">add_column</span>(<span class="at">prediction =</span> cl, <span class="at">probability =</span> max_prob)</span>
+<span id="cb59-57"><a href="#cb59-57" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb59-58"><a href="#cb59-58" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(g, <span class="at">mapping =</span> <span class="fu">aes</span>(</span>
+<span id="cb59-59"><a href="#cb59-59" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> .data[[<span class="fu">colnames</span>(g)[<span class="dv">1</span>]]], <span class="at">y =</span> .data[[<span class="fu">colnames</span>(g)[<span class="dv">2</span>]]])) <span class="sc">+</span></span>
+<span id="cb59-60"><a href="#cb59-60" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_raster</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">fill =</span> prediction, <span class="at">alpha =</span> probability)) <span class="sc">+</span></span>
+<span id="cb59-61"><a href="#cb59-61" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_contour</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">z =</span> <span class="fu">as.numeric</span>(prediction)), </span>
+<span id="cb59-62"><a href="#cb59-62" aria-hidden="true" tabindex="-1"></a>      <span class="at">bins =</span> <span class="fu">length</span>(<span class="fu">levels</span>(cl)), <span class="at">linewidth =</span> .<span class="dv">5</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb59-63"><a href="#cb59-63" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">data =</span> data, <span class="at">mapping =</span>  <span class="fu">aes</span>(</span>
+<span id="cb59-64"><a href="#cb59-64" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> .data[[<span class="fu">colnames</span>(data)[<span class="dv">1</span>]]], </span>
+<span id="cb59-65"><a href="#cb59-65" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> .data[[<span class="fu">colnames</span>(data)[<span class="dv">2</span>]]],</span>
+<span id="cb59-66"><a href="#cb59-66" aria-hidden="true" tabindex="-1"></a>      <span class="at">shape =</span> .data[[class_var]]), <span class="at">alpha =</span> .<span class="dv">7</span>) <span class="sc">+</span> </span>
+<span id="cb59-67"><a href="#cb59-67" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_alpha_continuous</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span>  </span>
+<span id="cb59-68"><a href="#cb59-68" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">subtitle =</span> <span class="fu">paste</span>(<span class="st">"Training accuracy:"</span>, <span class="fu">round</span>(acc, <span class="dv">2</span>))) <span class="sc">+</span></span>
+<span id="cb59-69"><a href="#cb59-69" aria-hidden="true" tabindex="-1"></a>     <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>)</span>
+<span id="cb59-70"><a href="#cb59-70" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="visualising-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="visualising-the-data">Visualising the data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1000</span>)</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>spam<span class="ot">&lt;-</span>  <span class="fu">as_tibble</span>(spam) <span class="sc">|&gt;</span></span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>()</span>
+<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> spam <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">select</span>(dollar, bang, money)</span>
+<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4,601 × 3
+   dollar  bang money
+    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1  0     0.778  0   
+ 2  0.18  0.372  0.43
+ 3  0.184 0.276  0.06
+ 4  0     0.137  0   
+ 5  0     0.135  0   
+ 6  0     0      0   
+ 7  0.054 0.164  0   
+ 8  0     0      0   
+ 9  0.203 0.181  0.15
+10  0.081 0.244  0   
+# ℹ 4,591 more rows</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(x, <span class="fu">aes</span>(<span class="at">x =</span> dollar, <span class="at">y =</span> bang, <span class="at">fill =</span> money)) <span class="sc">+</span>  </span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_density_2d</span>(<span class="at">geom =</span> <span class="st">"polygon"</span>, <span class="fu">aes</span>(<span class="at">alpha =</span> <span class="fu">after_stat</span>(level))) <span class="sc">+</span></span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"dollar"</span>,</span>
+<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"bang"</span>,</span>
+<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"money"</span>,</span>
+<span id="cb62-8"><a href="#cb62-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">alpha =</span> <span class="st">"Density"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The following aesthetics were dropped during statistical transformation: fill
+ℹ This can happen when ggplot fails to infer the correct grouping structure in
+  the data.
+ℹ Did you forget to specify a `group` aesthetic or to convert a numerical
+  variable into a factor?</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>x<span class="sc">$</span>dollar <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(x<span class="sc">$</span>dollar)</span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>x<span class="sc">$</span>bang <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(x<span class="sc">$</span>bang)</span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Replace non-numeric values with NA</span></span>
+<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>x<span class="sc">$</span>dollar[<span class="sc">!</span><span class="fu">is.na</span>(x<span class="sc">$</span>dollar) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.numeric</span>(x<span class="sc">$</span>dollar)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a>x<span class="sc">$</span>bang[<span class="sc">!</span><span class="fu">is.na</span>(x<span class="sc">$</span>bang) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.numeric</span>(x<span class="sc">$</span>bang)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Due to the very small ranges(0-1) in data for most of the features in the dataset, the visualisation part of the assignment is not very practical.</p>
+<p>Using the dataset suggested in the reproduce doc.</p>
+<section id="penguins-dataset" class="level3">
+<h3 class="anchored" data-anchor-id="penguins-dataset"><strong>Penguins Dataset</strong></h3>
+<ul>
+<li>We utilize two of the penguins dataset’s dimensions for simpler display. On a map, contour lines represent the density like mountains.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1000</span>)</span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"penguins"</span>)</span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>penguins <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(penguins) <span class="sc">|&gt;</span></span>
+<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>()</span>
+<span id="cb65-5"><a href="#cb65-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb65-6"><a href="#cb65-6" aria-hidden="true" tabindex="-1"></a><span class="do">### Three classes </span></span>
+<span id="cb65-7"><a href="#cb65-7" aria-hidden="true" tabindex="-1"></a><span class="do">### (note: MASS also has a select function which hides dplyr's select)</span></span>
+<span id="cb65-8"><a href="#cb65-8" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> penguins <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">select</span>(bill_length_mm, bill_depth_mm, species)</span>
+<span id="cb65-9"><a href="#cb65-9" aria-hidden="true" tabindex="-1"></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 333 × 3
+   bill_length_mm bill_depth_mm species
+            &lt;dbl&gt;         &lt;dbl&gt; &lt;fct&gt;  
+ 1           39.1          18.7 Adelie 
+ 2           39.5          17.4 Adelie 
+ 3           40.3          18   Adelie 
+ 4           36.7          19.3 Adelie 
+ 5           39.3          20.6 Adelie 
+ 6           38.9          17.8 Adelie 
+ 7           39.2          19.6 Adelie 
+ 8           41.1          17.6 Adelie 
+ 9           38.6          21.2 Adelie 
+10           34.6          21.1 Adelie 
+# ℹ 323 more rows</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(x, <span class="fu">aes</span>(<span class="at">x =</span> bill_length_mm, <span class="at">y =</span> bill_depth_mm, <span class="at">fill =</span> species)) <span class="sc">+</span>  </span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_density_2d</span>(<span class="at">geom =</span> <span class="st">"polygon"</span>, <span class="fu">aes</span>(<span class="at">alpha =</span> <span class="fu">after_stat</span>(level))) <span class="sc">+</span></span>
+<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
+<span id="cb67-5"><a href="#cb67-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Bill length (mm)"</span>,</span>
+<span id="cb67-6"><a href="#cb67-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Bill depth (mm)"</span>,</span>
+<span id="cb67-7"><a href="#cb67-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Species"</span>,</span>
+<span id="cb67-8"><a href="#cb67-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">alpha =</span> <span class="st">"Density"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<section id="k-nearest-neighbors-classifier" class="level4">
+<h4 class="anchored" data-anchor-id="k-nearest-neighbors-classifier">K-Nearest Neighbors Classifier</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> caret<span class="sc">::</span><span class="fu">knn3</span>(species <span class="sc">~</span> ., <span class="at">data =</span> _, <span class="at">k =</span> <span class="dv">1</span>)</span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"species"</span>) <span class="sc">+</span> </span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"kNN (1 neighbor)"</span>,</span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Bill length (mm)"</span>,</span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Bill depth (mm)"</span>,</span>
+<span id="cb68-6"><a href="#cb68-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Species"</span>,</span>
+<span id="cb68-7"><a href="#cb68-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-34-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> caret<span class="sc">::</span><span class="fu">knn3</span>(species <span class="sc">~</span> ., <span class="at">data =</span> _, <span class="at">k =</span> <span class="dv">3</span>)</span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"species"</span>) <span class="sc">+</span> </span>
+<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"kNN (3 neighbor)"</span>,</span>
+<span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Bill length (mm)"</span>,</span>
+<span id="cb69-5"><a href="#cb69-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Bill depth (mm)"</span>,</span>
+<span id="cb69-6"><a href="#cb69-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Species"</span>,</span>
+<span id="cb69-7"><a href="#cb69-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-35-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> caret<span class="sc">::</span><span class="fu">knn3</span>(species <span class="sc">~</span> ., <span class="at">data =</span> _, <span class="at">k =</span> <span class="dv">9</span>)</span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"species"</span>) <span class="sc">+</span> </span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"kNN (9 neighbor)"</span>,</span>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Bill length (mm)"</span>,</span>
+<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Bill depth (mm)"</span>,</span>
+<span id="cb70-6"><a href="#cb70-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Species"</span>,</span>
+<span id="cb70-7"><a href="#cb70-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-36-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>When k is low, there are white areas surrounding points where penguins from different classes overlap. In these regions, the algorithm randomly selects a class during prediction, resulting in a wavering decision boundary. Predictions in these areas lack stability, which means that requesting a class more than once could produce different results each time. As k increases, the decision boundary becomes more gradual.</p>
+</section>
+<section id="naive-bayes-classifier" class="level4">
+<h4 class="anchored" data-anchor-id="naive-bayes-classifier">Naive Bayes Classifier</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> e1071<span class="sc">::</span><span class="fu">naiveBayes</span>(species <span class="sc">~</span> ., <span class="at">data =</span> _)</span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"species"</span>, </span>
+<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">predict_type =</span> <span class="fu">c</span>(<span class="st">"class"</span>, <span class="st">"raw"</span>)) <span class="sc">+</span> </span>
+<span id="cb71-4"><a href="#cb71-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Naive Bayes"</span>,</span>
+<span id="cb71-5"><a href="#cb71-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Bill length (mm)"</span>,</span>
+<span id="cb71-6"><a href="#cb71-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Bill depth (mm)"</span>,</span>
+<span id="cb71-7"><a href="#cb71-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Species"</span>,</span>
+<span id="cb71-8"><a href="#cb71-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-37-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="linear-discriminant-analysis" class="level4">
+<h4 class="anchored" data-anchor-id="linear-discriminant-analysis">Linear Discriminant Analysis</h4>
+<ul>
+<li>Linear Discriminant Analysis (LDA) is a supervised learning algorithm used for classification tasks in machine learning. It is a technique used to find a linear combination of features that best separates the classes in a dataset.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">lda</span>(species <span class="sc">~</span> ., <span class="at">data =</span> _)</span>
+<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"species"</span>) <span class="sc">+</span> </span>
+<span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"LDA"</span>,</span>
+<span id="cb72-4"><a href="#cb72-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Bill length (mm)"</span>,</span>
+<span id="cb72-5"><a href="#cb72-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Bill depth (mm)"</span>,</span>
+<span id="cb72-6"><a href="#cb72-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Species"</span>,</span>
+<span id="cb72-7"><a href="#cb72-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-38-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The plot displays the decision boundaries of the LDA classifier. It shows how the classifier predicts the class of data points based on their features</p>
+</section>
+<section id="multinomial-logistic-regression-implemented-in-nnet" class="level4">
+<h4 class="anchored" data-anchor-id="multinomial-logistic-regression-implemented-in-nnet">Multinomial Logistic Regression (implemented in nnet)</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> nnet<span class="sc">::</span><span class="fu">multinom</span>(species <span class="sc">~</span>., <span class="at">data =</span> _)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># weights:  12 (6 variable)
+initial  value 365.837892 
+iter  10 value 26.650783
+iter  20 value 23.943597
+iter  30 value 23.916873
+iter  40 value 23.901339
+iter  50 value 23.895442
+iter  60 value 23.894251
+final  value 23.892065 
+converged</code></pre>
+</div>
+</div>
+<p>The output provides details about the optimization iterations, including the initial value, values that decrease iteratively, and the converged value at the end. It also shows that after 100 iterations, the optimization process was stopped.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"species"</span>) <span class="sc">+</span> </span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Multinomial Logistic Regression"</span>,</span>
+<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Bill length (mm)"</span>,</span>
+<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Bill depth (mm)"</span>,</span>
+<span id="cb75-5"><a href="#cb75-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Species"</span>,</span>
+<span id="cb75-6"><a href="#cb75-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-40-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The decision boundaries and the way the model divides or classes data points into various classes are displayed in the figure.</p>
+</section>
+<section id="decision-trees" class="level4">
+<h4 class="anchored" data-anchor-id="decision-trees">Decision Trees</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> rpart<span class="sc">::</span><span class="fu">rpart</span>(species <span class="sc">~</span> ., <span class="at">data =</span> _)</span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"species"</span>) <span class="sc">+</span> </span>
+<span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"CART"</span>,</span>
+<span id="cb76-4"><a href="#cb76-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Bill length (mm)"</span>,</span>
+<span id="cb76-5"><a href="#cb76-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Bill depth (mm)"</span>,</span>
+<span id="cb76-6"><a href="#cb76-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Species"</span>,</span>
+<span id="cb76-7"><a href="#cb76-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-41-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p><strong><code>The trade-off between model accuracy and complexity is managed by the complexity parameter, or cp, which is set to 0.001. A more complicated tree has a lower cp value. The minimum number of observations needed to split a node is determined by minsplit.</code></strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> rpart<span class="sc">::</span><span class="fu">rpart</span>(species <span class="sc">~</span> ., <span class="at">data =</span> _,</span>
+<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">rpart.control</span>(<span class="at">cp =</span> <span class="fl">0.001</span>, <span class="at">minsplit =</span> <span class="dv">1</span>))</span>
+<span id="cb77-3"><a href="#cb77-3" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"species"</span>) <span class="sc">+</span> </span>
+<span id="cb77-4"><a href="#cb77-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"CART (overfitting)"</span>,</span>
+<span id="cb77-5"><a href="#cb77-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Bill length (mm)"</span>,</span>
+<span id="cb77-6"><a href="#cb77-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Bill depth (mm)"</span>,</span>
+<span id="cb77-7"><a href="#cb77-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Species"</span>,</span>
+<span id="cb77-8"><a href="#cb77-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-42-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> C50<span class="sc">::</span><span class="fu">C5.0</span>(species <span class="sc">~</span> ., <span class="at">data =</span> _)</span>
+<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"species"</span>) <span class="sc">+</span> </span>
+<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"C5.0"</span>,</span>
+<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Bill length (mm)"</span>,</span>
+<span id="cb78-5"><a href="#cb78-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Bill depth (mm)"</span>,</span>
+<span id="cb78-6"><a href="#cb78-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Species"</span>,</span>
+<span id="cb78-7"><a href="#cb78-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-43-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> randomForest<span class="sc">::</span><span class="fu">randomForest</span>(species <span class="sc">~</span> ., <span class="at">data =</span> _)</span>
+<span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"species"</span>) <span class="sc">+</span> </span>
+<span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Random Forest"</span>,</span>
+<span id="cb79-4"><a href="#cb79-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Bill length (mm)"</span>,</span>
+<span id="cb79-5"><a href="#cb79-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Bill depth (mm)"</span>,</span>
+<span id="cb79-6"><a href="#cb79-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Species"</span>,</span>
+<span id="cb79-7"><a href="#cb79-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-44-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The decision plot typically shows the decision boundaries and how the Random Forest model categorizes different data points.</p>
+</section>
+<section id="svm" class="level4">
+<h4 class="anchored" data-anchor-id="svm">SVM</h4>
+<p>SVM algorithms are very effective as we try to find the maximum separating hyperplane between the different classes available in the target feature.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> e1071<span class="sc">::</span><span class="fu">svm</span>(species <span class="sc">~</span> ., <span class="at">data =</span> _, <span class="at">kernel =</span> <span class="st">"linear"</span>)</span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"species"</span>) <span class="sc">+</span> </span>
+<span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"SVM (linear kernel)"</span>,</span>
+<span id="cb80-4"><a href="#cb80-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Bill length (mm)"</span>,</span>
+<span id="cb80-5"><a href="#cb80-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Bill depth (mm)"</span>,</span>
+<span id="cb80-6"><a href="#cb80-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Species"</span>,</span>
+<span id="cb80-7"><a href="#cb80-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-45-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The plot based on the SVM model with a linear kernel. Here linear kernel is more suitable.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> e1071<span class="sc">::</span><span class="fu">svm</span>(species <span class="sc">~</span> ., <span class="at">data =</span> _, <span class="at">kernel =</span> <span class="st">"radial"</span>)</span>
+<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"species"</span>) <span class="sc">+</span> </span>
+<span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"SVM (radial kernel)"</span>,</span>
+<span id="cb81-4"><a href="#cb81-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Bill length (mm)"</span>,</span>
+<span id="cb81-5"><a href="#cb81-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Bill depth (mm)"</span>,</span>
+<span id="cb81-6"><a href="#cb81-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Species"</span>,</span>
+<span id="cb81-7"><a href="#cb81-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-46-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The “radial” kernel is a non-linear kernel and is suitable for capturing complex patterns in the data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> e1071<span class="sc">::</span><span class="fu">svm</span>(species <span class="sc">~</span> ., <span class="at">data =</span> _, <span class="at">kernel =</span> <span class="st">"polynomial"</span>)</span>
+<span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"species"</span>) <span class="sc">+</span> </span>
+<span id="cb82-3"><a href="#cb82-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"SVM (polynomial kernel)"</span>,</span>
+<span id="cb82-4"><a href="#cb82-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Bill length (mm)"</span>,</span>
+<span id="cb82-5"><a href="#cb82-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Bill depth (mm)"</span>,</span>
+<span id="cb82-6"><a href="#cb82-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Species"</span>,</span>
+<span id="cb82-7"><a href="#cb82-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-47-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> e1071<span class="sc">::</span><span class="fu">svm</span>(species <span class="sc">~</span> ., <span class="at">data =</span> _, <span class="at">kernel =</span> <span class="st">"sigmoid"</span>)</span>
+<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"species"</span>) <span class="sc">+</span> </span>
+<span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"SVM (sigmoid kernel)"</span>,</span>
+<span id="cb83-4"><a href="#cb83-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Bill length (mm)"</span>,</span>
+<span id="cb83-5"><a href="#cb83-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Bill depth (mm)"</span>,</span>
+<span id="cb83-6"><a href="#cb83-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Species"</span>,</span>
+<span id="cb83-7"><a href="#cb83-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-48-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="single-layer-feed-forward-neural-networks" class="level4">
+<h4 class="anchored" data-anchor-id="single-layer-feed-forward-neural-networks">Single Layer Feed-forward Neural Networks</h4>
+<p>Not able to plot for this dataset as getting warning: Computation failed in `stat_contour()`</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span>x <span class="sc">|&gt;</span> nnet<span class="sc">::</span><span class="fu">nnet</span>(species <span class="sc">~</span> ., <span class="at">data =</span> _, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">trace =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var  =</span> <span class="st">"species"</span>, </span>
+<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">predict_type =</span> <span class="fu">c</span>(<span class="st">"class"</span>, <span class="st">"raw"</span>)) <span class="sc">+</span> </span>
+<span id="cb84-4"><a href="#cb84-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"NN (1 neuron)"</span>,</span>
+<span id="cb84-5"><a href="#cb84-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Bill length (mm)"</span>,</span>
+<span id="cb84-6"><a href="#cb84-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Bill depth (mm)"</span>,</span>
+<span id="cb84-7"><a href="#cb84-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Species"</span>,</span>
+<span id="cb84-8"><a href="#cb84-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-49-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span>x <span class="sc">|&gt;</span> nnet<span class="sc">::</span><span class="fu">nnet</span>(species <span class="sc">~</span> ., <span class="at">data =</span> _, <span class="at">size =</span> <span class="dv">2</span>, <span class="at">trace =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var  =</span> <span class="st">"species"</span>, </span>
+<span id="cb85-3"><a href="#cb85-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">predict_type =</span> <span class="fu">c</span>(<span class="st">"class"</span>, <span class="st">"raw"</span>)) <span class="sc">+</span> </span>
+<span id="cb85-4"><a href="#cb85-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"NN (2 neurons)"</span>,</span>
+<span id="cb85-5"><a href="#cb85-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Bill length (mm)"</span>,</span>
+<span id="cb85-6"><a href="#cb85-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Bill depth (mm)"</span>,</span>
+<span id="cb85-7"><a href="#cb85-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Species"</span>,</span>
+<span id="cb85-8"><a href="#cb85-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-50-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span>x <span class="sc">|&gt;</span> nnet<span class="sc">::</span><span class="fu">nnet</span>(species <span class="sc">~</span> ., <span class="at">data =</span> _, <span class="at">size =</span> <span class="dv">4</span>, <span class="at">trace =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var  =</span> <span class="st">"species"</span>, </span>
+<span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">predict_type =</span> <span class="fu">c</span>(<span class="st">"class"</span>, <span class="st">"raw"</span>)) <span class="sc">+</span> </span>
+<span id="cb86-4"><a href="#cb86-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"NN (4 neurons)"</span>,</span>
+<span id="cb86-5"><a href="#cb86-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Bill length (mm)"</span>,</span>
+<span id="cb86-6"><a href="#cb86-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Bill depth (mm)"</span>,</span>
+<span id="cb86-7"><a href="#cb86-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Species"</span>,</span>
+<span id="cb86-8"><a href="#cb86-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-51-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span>x <span class="sc">|&gt;</span> nnet<span class="sc">::</span><span class="fu">nnet</span>(species <span class="sc">~</span> ., <span class="at">data =</span> _, <span class="at">size =</span> <span class="dv">10</span>, <span class="at">trace =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var  =</span> <span class="st">"species"</span>, </span>
+<span id="cb87-3"><a href="#cb87-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">predict_type =</span> <span class="fu">c</span>(<span class="st">"class"</span>, <span class="st">"raw"</span>)) <span class="sc">+</span> </span>
+<span id="cb87-4"><a href="#cb87-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"NN (10 neurons)"</span>,</span>
+<span id="cb87-5"><a href="#cb87-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Bill length (mm)"</span>,</span>
+<span id="cb87-6"><a href="#cb87-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Bill depth (mm)"</span>,</span>
+<span id="cb87-7"><a href="#cb87-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Species"</span>,</span>
+<span id="cb87-8"><a href="#cb87-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-52-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="circle-dataset" class="level3">
+<h3 class="anchored" data-anchor-id="circle-dataset"><strong>Circle Dataset</strong></h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1000</span>)</span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> mlbench<span class="sc">::</span><span class="fu">mlbench.circle</span>(<span class="dv">500</span>)</span>
+<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a><span class="do">###x &lt;- mlbench::mlbench.cassini(500)</span></span>
+<span id="cb88-5"><a href="#cb88-5" aria-hidden="true" tabindex="-1"></a><span class="do">###x &lt;- mlbench::mlbench.spirals(500, sd = .1)</span></span>
+<span id="cb88-6"><a href="#cb88-6" aria-hidden="true" tabindex="-1"></a><span class="do">###x &lt;- mlbench::mlbench.smiley(500)</span></span>
+<span id="cb88-7"><a href="#cb88-7" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="fu">as.data.frame</span>(x<span class="sc">$</span>x), <span class="fu">factor</span>(x<span class="sc">$</span>classes))</span>
+<span id="cb88-8"><a href="#cb88-8" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(x) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"x"</span>, <span class="st">"y"</span>, <span class="st">"class"</span>)</span>
+<span id="cb88-9"><a href="#cb88-9" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(x)</span>
+<span id="cb88-10"><a href="#cb88-10" aria-hidden="true" tabindex="-1"></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 500 × 3
+         x       y class
+     &lt;dbl&gt;   &lt;dbl&gt; &lt;fct&gt;
+ 1 -0.344   0.448  1    
+ 2  0.518   0.915  2    
+ 3 -0.772  -0.0913 1    
+ 4  0.382   0.412  1    
+ 5  0.0328  0.438  1    
+ 6 -0.865  -0.354  2    
+ 7  0.477   0.640  2    
+ 8  0.167  -0.809  2    
+ 9 -0.568  -0.281  1    
+10 -0.488   0.638  2    
+# ℹ 490 more rows</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(x, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">color =</span> class)) <span class="sc">+</span> </span>
+<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb90-3"><a href="#cb90-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-54-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<section id="k-nearest-classifier" class="level4">
+<h4 class="anchored" data-anchor-id="k-nearest-classifier">K-Nearest Classifier</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> caret<span class="sc">::</span><span class="fu">knn3</span>(class <span class="sc">~</span> ., <span class="at">data =</span> _, <span class="at">k =</span> <span class="dv">1</span>)</span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"class"</span>) <span class="sc">+</span> </span>
+<span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"kNN (1 neighbor)"</span>,</span>
+<span id="cb91-4"><a href="#cb91-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Class"</span>,</span>
+<span id="cb91-5"><a href="#cb91-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-55-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> caret<span class="sc">::</span><span class="fu">knn3</span>(class <span class="sc">~</span> ., <span class="at">data =</span> _, <span class="at">k =</span> <span class="dv">10</span>)</span>
+<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"class"</span>) <span class="sc">+</span> </span>
+<span id="cb92-3"><a href="#cb92-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"kNN (10 neighbor)"</span>,</span>
+<span id="cb92-4"><a href="#cb92-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Class"</span>,</span>
+<span id="cb92-5"><a href="#cb92-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-56-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="naive-bayes-classifier-1" class="level4">
+<h4 class="anchored" data-anchor-id="naive-bayes-classifier-1">Naive Bayes Classifier</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> e1071<span class="sc">::</span><span class="fu">naiveBayes</span>(class <span class="sc">~</span> ., <span class="at">data =</span> _)</span>
+<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"class"</span>, </span>
+<span id="cb93-3"><a href="#cb93-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">predict_type =</span> <span class="fu">c</span>(<span class="st">"class"</span>, <span class="st">"raw"</span>)) <span class="sc">+</span> </span>
+<span id="cb93-4"><a href="#cb93-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"naive Bayes"</span>,</span>
+<span id="cb93-5"><a href="#cb93-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Class"</span>,</span>
+<span id="cb93-6"><a href="#cb93-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-57-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="linear-discriminant-analysis-1" class="level4">
+<h4 class="anchored" data-anchor-id="linear-discriminant-analysis-1">Linear Discriminant Analysis</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">lda</span>(class <span class="sc">~</span> ., <span class="at">data =</span> _)</span>
+<span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"class"</span>) <span class="sc">+</span> </span>
+<span id="cb94-3"><a href="#cb94-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"LDA"</span>,</span>
+<span id="cb94-4"><a href="#cb94-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Class"</span>,</span>
+<span id="cb94-5"><a href="#cb94-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-58-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="logistic-regression-implemented-in-nnet" class="level4">
+<h4 class="anchored" data-anchor-id="logistic-regression-implemented-in-nnet">Logistic Regression (implemented in nnet)</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> nnet<span class="sc">::</span><span class="fu">multinom</span>(class <span class="sc">~</span>., <span class="at">data =</span> _)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># weights:  4 (3 variable)
+initial  value 346.573590 
+final  value 346.308371 
+converged</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"class"</span>) <span class="sc">+</span> </span>
+<span id="cb97-2"><a href="#cb97-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Multinomial Logistic Regression"</span>,</span>
+<span id="cb97-3"><a href="#cb97-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Class"</span>,</span>
+<span id="cb97-4"><a href="#cb97-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-60-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="decision-trees-1" class="level4">
+<h4 class="anchored" data-anchor-id="decision-trees-1">Decision Trees</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> rpart<span class="sc">::</span><span class="fu">rpart</span>(class <span class="sc">~</span> ., <span class="at">data =</span> _)</span>
+<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"class"</span>) <span class="sc">+</span> </span>
+<span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"CART"</span>,</span>
+<span id="cb98-4"><a href="#cb98-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Class"</span>,</span>
+<span id="cb98-5"><a href="#cb98-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-61-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> rpart<span class="sc">::</span><span class="fu">rpart</span>(class <span class="sc">~</span> ., <span class="at">data =</span> _,</span>
+<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">rpart.control</span>(<span class="at">cp =</span> <span class="fl">0.001</span>, <span class="at">minsplit =</span> <span class="dv">1</span>))</span>
+<span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"class"</span>) <span class="sc">+</span> </span>
+<span id="cb99-4"><a href="#cb99-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"CART (overfitting)"</span>,</span>
+<span id="cb99-5"><a href="#cb99-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Class"</span>,</span>
+<span id="cb99-6"><a href="#cb99-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-62-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> C50<span class="sc">::</span><span class="fu">C5.0</span>(class <span class="sc">~</span> ., <span class="at">data =</span> _)</span>
+<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"class"</span>) <span class="sc">+</span> </span>
+<span id="cb100-3"><a href="#cb100-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"C5.0"</span>,</span>
+<span id="cb100-4"><a href="#cb100-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Class"</span>,</span>
+<span id="cb100-5"><a href="#cb100-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-63-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb101"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(randomForest)</span>
+<span id="cb101-2"><a href="#cb101-2" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> <span class="fu">randomForest</span>(class <span class="sc">~</span> ., <span class="at">data =</span> _)</span>
+<span id="cb101-3"><a href="#cb101-3" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"class"</span>) <span class="sc">+</span> </span>
+<span id="cb101-4"><a href="#cb101-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Random Forest"</span>,</span>
+<span id="cb101-5"><a href="#cb101-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Class"</span>,</span>
+<span id="cb101-6"><a href="#cb101-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-64-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="svm-1" class="level4">
+<h4 class="anchored" data-anchor-id="svm-1">SVM</h4>
+<p>Linear SVM does not work on this data</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> e1071<span class="sc">::</span><span class="fu">svm</span>(class <span class="sc">~</span> ., <span class="at">data =</span> _, <span class="at">kernel =</span> <span class="st">"linear"</span>)</span>
+<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"class"</span>) <span class="sc">+</span> </span>
+<span id="cb102-3"><a href="#cb102-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"SVM (linear kernel)"</span>,</span>
+<span id="cb102-4"><a href="#cb102-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Class"</span>,</span>
+<span id="cb102-5"><a href="#cb102-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-65-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb103"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> e1071<span class="sc">::</span><span class="fu">svm</span>(class <span class="sc">~</span> ., <span class="at">data =</span> _, <span class="at">kernel =</span> <span class="st">"radial"</span>)</span>
+<span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"class"</span>) <span class="sc">+</span> </span>
+<span id="cb103-3"><a href="#cb103-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"SVM (radial kernel)"</span>,</span>
+<span id="cb103-4"><a href="#cb103-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Class"</span>,</span>
+<span id="cb103-5"><a href="#cb103-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-66-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> e1071<span class="sc">::</span><span class="fu">svm</span>(class <span class="sc">~</span> ., <span class="at">data =</span> _, <span class="at">kernel =</span> <span class="st">"polynomial"</span>)</span>
+<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"class"</span>) <span class="sc">+</span> </span>
+<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"SVM (polynomial kernel)"</span>,</span>
+<span id="cb104-4"><a href="#cb104-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Class"</span>,</span>
+<span id="cb104-5"><a href="#cb104-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-67-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> x <span class="sc">|&gt;</span> e1071<span class="sc">::</span><span class="fu">svm</span>(class <span class="sc">~</span> ., <span class="at">data =</span> _, <span class="at">kernel =</span> <span class="st">"sigmoid"</span>)</span>
+<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"class"</span>) <span class="sc">+</span> </span>
+<span id="cb105-3"><a href="#cb105-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"SVM (sigmoid kernel)"</span>,</span>
+<span id="cb105-4"><a href="#cb105-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Class"</span>,</span>
+<span id="cb105-5"><a href="#cb105-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-68-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="single-layer-feed-forward-neural-network" class="level4">
+<h4 class="anchored" data-anchor-id="single-layer-feed-forward-neural-network">Single Layer Feed Forward Neural Network</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb106"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span>x <span class="sc">|&gt;</span> nnet<span class="sc">::</span><span class="fu">nnet</span>(class <span class="sc">~</span> ., <span class="at">data =</span> _, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">trace =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb106-2"><a href="#cb106-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"class"</span>, </span>
+<span id="cb106-3"><a href="#cb106-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">predict_type =</span> <span class="fu">c</span>(<span class="st">"class"</span>)) <span class="sc">+</span> </span>
+<span id="cb106-4"><a href="#cb106-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"NN (1 neuron)"</span>,</span>
+<span id="cb106-5"><a href="#cb106-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Class"</span>,</span>
+<span id="cb106-6"><a href="#cb106-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-69-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span>x <span class="sc">|&gt;</span> nnet<span class="sc">::</span><span class="fu">nnet</span>(class <span class="sc">~</span> ., <span class="at">data =</span> _, <span class="at">size =</span> <span class="dv">2</span>, <span class="at">trace =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"class"</span>, </span>
+<span id="cb107-3"><a href="#cb107-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">predict_type =</span> <span class="fu">c</span>(<span class="st">"class"</span>)) <span class="sc">+</span> </span>
+<span id="cb107-4"><a href="#cb107-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"NN (2 neurons)"</span>,</span>
+<span id="cb107-5"><a href="#cb107-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Class"</span>,</span>
+<span id="cb107-6"><a href="#cb107-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-70-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb108"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span>x <span class="sc">|&gt;</span> nnet<span class="sc">::</span><span class="fu">nnet</span>(class <span class="sc">~</span> ., <span class="at">data =</span> _, <span class="at">size =</span> <span class="dv">4</span>, <span class="at">trace =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb108-2"><a href="#cb108-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"class"</span>, </span>
+<span id="cb108-3"><a href="#cb108-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">predict_type =</span> <span class="fu">c</span>(<span class="st">"class"</span>)) <span class="sc">+</span> </span>
+<span id="cb108-4"><a href="#cb108-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"NN (4 neurons)"</span>,</span>
+<span id="cb108-5"><a href="#cb108-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Class"</span>,</span>
+<span id="cb108-6"><a href="#cb108-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-71-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span>x <span class="sc">|&gt;</span> nnet<span class="sc">::</span><span class="fu">nnet</span>(class <span class="sc">~</span> ., <span class="at">data =</span> _, <span class="at">size =</span> <span class="dv">10</span>, <span class="at">trace =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb109-2"><a href="#cb109-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decisionplot</span>(model, x, <span class="at">class_var =</span> <span class="st">"class"</span>, </span>
+<span id="cb109-3"><a href="#cb109-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">predict_type =</span> <span class="fu">c</span>(<span class="st">"class"</span>)) <span class="sc">+</span> </span>
+<span id="cb109-4"><a href="#cb109-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"NN (10 neurons)"</span>,</span>
+<span id="cb109-5"><a href="#cb109-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Class"</span>,</span>
+<span id="cb109-6"><a href="#cb109-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Prediction"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hw03-2_files/figure-html/unnamed-chunk-72-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
