@@ -475,7 +475,7 @@ spam_train |>
 
 ### **Feature Subset Selection**
 
-Often features are related and calculating importance for each feature independently is not optimal. We can use greedy search heuristics. For example `cfs` uses correlation/entropy with best first search.
+Calculating importance for each feature independently is not optimal. We can use various greedy search heuristics. For example `cfs` uses correlation/entropy with best first search.
 
 ```{r}
 spam_train |> 
@@ -506,7 +506,7 @@ Start with all features (but not the class variable `type`)
 features <- spam_train |> colnames() |> setdiff("yesno")
 ```
 
-There are several (greedy) search strategies available. These run for a while!
+There are several (greedy) search strategies available.
 
 ```{r}
 ##subset <- backward.search(features, evaluator)
