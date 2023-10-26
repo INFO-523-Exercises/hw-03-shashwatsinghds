@@ -79,11 +79,13 @@ Multi-core support can be used for cross-validation. **Note:** It is commented o
 ##getDoParWorkers()
 ```
 
-Test data is not used in the model building process and needs to be set aside purely for testing the model after it is completely built. Using 80-20 method, i.e., 80 percent for training and 20 percent for testing.
+Test data is not used in the model building process and needs to be set aside purely for testing the model after it is completely built.
+
+Using 80-20 partitioning, i.e., 80 percent for training and 20 percent for testing.
 
 ```{r}
 set.seed(123)  # for reproducibility
-inTrain <- createDataPartition(y = spam$yesno, p = .8)[[1]]
+inTrain <- createDataPartition(y = spam$yesno, p = .8)[[1]] #80 precent data is assigned to inTrain
 spam_train <- dplyr::slice(spam, inTrain)
 spam_test <- dplyr::slice(spam, -inTrain)
 ```
@@ -96,11 +98,9 @@ Create a fixed sampling scheme (10-folds) so we can compare the fitted models la
 train_index <- createFolds(spam_train$yesno, k = 10)
 ```
 
-The fixed folds are used in `train()` with the argument `trControl = trainControl(method = "cv", indexOut = train_index))`. If you don\'t need fixed folds, then remove `indexOut = train_index` in the code below.
+The fixed folds are used in `train()` with the argument `trControl = trainControl(method = "cv", indexOut = train_index))`. If fixed folds are not needed, we can remove `indexOut = train_index` in the code below.
 
-For help with building models in caret see: `? train`
 
-**Note:** Be careful if you have many `NA` values in your data. `train()` and cross-validation many fail in some cases. If that is the case then you can remove features (columns) which have many `NA`s, omit `NA`s using `na.omit()` or use imputation to replace them with reasonable values (e.g., by the feature mean or via kNN). Highly imbalanced datasets are also problematic since there is a chance that a fold does not contain examples of each class leading to a hard to understand error message.
 
 ### **Conditional Inference Tree (Decision Tree)**
 
@@ -119,6 +119,8 @@ ctreeFit
 plot(ctreeFit$finalModel)
 ```
 
+- Again, due to the continuous variables being used for classification, it is making the decision tree very large and branched.
+
 ### **C 4.5 Decision Tree**
 
 ```{r}
@@ -129,8 +131,10 @@ C45Fit <- spam_train |> train(yesno ~ .,
     trControl = trainControl(method = "cv", indexOut = train_index))
 C45Fit
 
-# This was failing to render due to the complexity of tree
+
 ```
+
+- This is a much better visual representation for continuous variable classificatons.
 
 ```{r}
 C45Fit$finalModel
@@ -274,7 +278,7 @@ bwplot(resamps, layout = c(3, 1))
 
 Perform inference about differences between models. For each metric, all pair-wise differences are computed and tested to assess if the difference is equal to zero. By default Bonferroni correction for multiple comparison is used. Differences are shown in the upper triangle and p-values are in the lower triangle.
 
--   Random forest Fit is performing the best here.
+-   Random forest Fit is performing the best here, followed by KNN.
 
 ```{r}
 difs <- diff(resamps)
@@ -285,7 +289,7 @@ difs
 summary(difs)
 ```
 
-All perform similarly well except ctree (differences in the first row are negative and the p-values in the first column are \<.05 indicating that the null-hypothesis of a difference of 0 can be rejected).
+ctree and SVM do not perform very well in this comparison (differences in the rows are negative.)
 
 ## **Applying the Chosen Model to the Test Data**
 
@@ -478,7 +482,9 @@ decisionplot(model, x, class_var = "species") +
        fill = "Prediction")
 ```
 
-When k is low, there are white areas surrounding points where penguins from different classes overlap. In these regions, the algorithm randomly selects a class during prediction, resulting in a wavering decision boundary. Predictions in these areas lack stability, which means that requesting a class more than once could produce different results each time. As k increases, the decision boundary becomes more gradual.
+When we use a smaller value of k, the decision boundary becomes more complex and fits the training data very closely
+
+When we use a larger value of k , the decision boundary becomes smoother and is less influenced by individual data points. 
 
 #### Naive Bayes Classifier
 
@@ -671,6 +677,8 @@ decisionplot(model, x, class_var  = "species",
        fill = "Prediction")
 ```
 
+- Overall, it is clearly visible that most of the classification techniques are able to separate out the data with high accuracy. We can infer from this is the features that are selected do a very good job for classifying the data.
+
 ### **Circle Dataset**
 
 ```{r warning=FALSE}
@@ -702,6 +710,7 @@ decisionplot(model, x, class_var = "class") +
        fill = "Prediction")
 ```
 
+- It has done an excellent job in classifying the data, as have the othe KNN classifications, with increased neighbour classification
 ```{r warning=FALSE}
 model <- x |> caret::knn3(class ~ ., data = _, k = 10)
 decisionplot(model, x, class_var = "class") + 
@@ -721,6 +730,7 @@ decisionplot(model, x, class_var = "class",
        fill = "Prediction")
 ```
 
+- Naive Bayes has also done a good job of classifying here with accuracy > 90%
 #### Linear Discriminant Analysis
 
 ```{r warning=FALSE}
@@ -731,6 +741,7 @@ decisionplot(model, x, class_var = "class") +
        fill = "Prediction")
 ```
 
+- Linear Discriminant analysis does a terrible job for classifying here.
 #### Logistic Regression (implemented in nnet)
 
 ```{r}
@@ -743,6 +754,8 @@ decisionplot(model, x, class_var = "class") +
        shape = "Class",
        fill = "Prediction")
 ```
+
+- Logistic regression is not able to classify accurately.
 
 #### Decision Trees
 
@@ -780,6 +793,7 @@ decisionplot(model, x, class_var = "class") +
        fill = "Prediction")
 ```
 
+- All decision tree models have done a good job in classifying the data.
 #### SVM
 
 Linear SVM does not work on this data
@@ -816,6 +830,7 @@ decisionplot(model, x, class_var = "class") +
        fill = "Prediction")
 ```
 
+- Only the radial SVM is able to classify the data with great accuracy.
 #### Single Layer Feed Forward Neural Network
 
 ```{r warning=FALSE}
@@ -853,4 +868,4 @@ decisionplot(model, x, class_var = "class",
        shape = "Class",
        fill = "Prediction")
 ```
-
+- As the layers of NN are increased, they are increasingly efficient in predicting the class of the data with great accuracy.
