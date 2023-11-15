@@ -18,7 +18,7 @@ if (!require(pacman))
 
 # Downloads and load required packages
 pacman::p_load(tidyverse, rpart, rpart.plot, caret, 
-  lattice, FSelector, sampling, pROC, mlbench)
+  lattice, FSelector, sampling, pROC, mlbench,here)
 
 # Installed FSelector using the link provided in slack
 
@@ -64,8 +64,9 @@ The features in the table are as
 -   **yesno -** Outcome variable, a factor with levels 'n' not spam, 'y' spam
 
 ```{r}
-# Loading the dataset
-spam <- read.csv("/Users/shashwatsingh/Documents/GitHub/hw-03-shashwatsinghds/data/spam.csv") 
+# Loading the dataset using here
+library(here)
+spam <- read.csv(here("data", "spam.csv"))
 
 head(spam)
 ```
